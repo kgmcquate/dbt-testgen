@@ -1,6 +1,7 @@
 target/
 dbt_packages/
 logs/
+dbt-env/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
