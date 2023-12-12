@@ -4,7 +4,10 @@
     materialized='table'
 ) }} #}
 
-{{ get_columns_cardinality(
-        'public',
-        'water_bodies'
+{{ print_uniqueness_test_suggestions(
+    'public',
+    'water_bodies',
+    enabled=true,
+    tags=["a", "b"]
+
 ) }}
