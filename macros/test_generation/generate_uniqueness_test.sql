@@ -16,9 +16,74 @@
 {% endmacro %}
 
 
-{% macro get_uniqueness_test_suggestions(
+{% macro print_uniqueness_test_suggestions_from_name(        
         schema_name,
         table_name,
+        use_anchors = false,
+        is_source = false,
+        tags = ["uniqueness"],
+        compound_key_length = 1,
+        dbt_config = None
+    ) 
+%}
+    {% if execute %}
+        {{ print(schema_name) }}
+
+        {% set table_relation = api.Relation.create(
+            database = target.database,
+            schema = schema_name,
+            identifier = table_name
+        ) %}
+
+        {{ print(table_relation) }}
+
+        {% do print_uniqueness_test_suggestions(table_relation, use_anchors, is_source, tags, compound_key_length, **kwargs) %} 
+
+    {% endif %}
+
+{% endmacro %}
+
+
+{% macro print_uniqueness_test_suggestions(        
+        table_relation,
+        use_anchors = false,
+        is_source = false,
+        tags = ["uniqueness"],
+        compound_key_length = 1,
+        dbt_config = None
+    ) 
+%}
+    {% if execute %}
+        {% set tests = get_uniqueness_test_suggestions(table_relation, is_source, tags, compound_key_length, **kwargs) %} 
+
+        {% if use_anchors %}
+            {% set yaml = toyaml(tests) %}
+        {% else %}
+            {# Using JSON to get rid fo the YAML anchors that toyaml puts in #}
+            {% set yaml = toyaml(fromjson(tojson(tests))) %}
+        {% endif %}
+
+        {{ print(yaml) }}
+    {% endif %}
+
+{% endmacro %}
+
+
+{% macro get_uniqueness_test_suggestions(
+        table_relation,
+        is_source = false,
+        tags = ["uniqueness"],
+        compound_key_length = 1,
+        dbt_config = None
+    ) %}
+    {# Run macro for the specific target DB #}
+    {{ return(adapter.dispatch('get_uniqueness_test_suggestions')(table_relation, is_source, tags, compound_key_length, **kwargs)) }}
+{%- endmacro %}
+
+
+{% macro default__get_uniqueness_test_suggestions(
+        table_relation,
+        is_source = false,
         tags = ["uniqueness"],
         compound_key_length = 1,
         dbt_config = None
@@ -28,93 +93,89 @@
     {% set test_config = kwargs %}
     {% do test_config.update({"tags": tags}) %}
 
-    {% if dbt_config == None %}
-        {% set dbt_config = {"models": []} %}
+    {% if is_source == true %}
+        {% set models_or_sources = "sources" %}
+    {% else %}
+        {% set models_or_sources = "models" %}
     {% endif %}
-
-    {{ print(dbt_config) }}
-
-    {% set table_relation = api.Relation.create(
-        database = target.database,
-        schema = schema_name,
-        identifier = table_name
-    ) %}
-
-    {% set count_distinct_exprs = [] %}
 
     {% set columns = adapter.get_columns_in_relation(table_relation) %}
 
-    {% set src_table = source(schema_name, table_name) %}
+    {% set column_names = [] %}
+    {% for col in columns %}
+        {% do column_names.append(col.column) %}
+    {% endfor %}
 
-    {% for column in columns %}
+    {% set column_combinations = [] %}
+    {% for i in range(compound_key_length) %}
+        {% for col_combo in modules.itertools.combinations(column_names, i + 1)%}
+            {% do column_combinations.append(col_combo) %}
+        {% endfor %}
+    {% endfor %}
+
+    {% set count_distinct_exprs = [] %}
+    {% set i = 0 %}
+    {% for column_combo in column_combinations %}
         {% do count_distinct_exprs.append(
-            "SELECT '" ~ column.name ~ "' AS colname, COUNT(DISTINCT " ~ column.name ~ ") AS cardinality FROM " ~ src_table
+            "SELECT " ~ loop.index ~ " AS ordering, count(1) AS cardinality from (SELECT 1 FROM " ~ table_relation ~ " GROUP BY " ~ column_combo|join(", ") ~ ") t"
         ) %}
     {% endfor %}
 
     {% set count_distinct_sql %}
-        {{ count_distinct_exprs | join("\nUNION ALL\n") }}
+    {{ count_distinct_exprs | join("\nUNION ALL\n") }}
+    ORDER BY ordering ASC
     {% endset %}
 
     {% set count_sql %}
-        {{ "SELECT count(1) AS table_count FROM " ~ src_table }} 
+        {{ "SELECT count(1) AS table_count FROM " ~ table_relation }} 
     {% endset%}
 
-    {% if execute %}
+    {{ print(count_distinct_sql) }}
 
-        {{ print(count_distinct_sql) }}
+    {% set table_count = query_to_list(count_sql)[0].table_count %}
 
-        {% set table_count = query_to_list(count_sql)[0].table_count %}
+    {% set cardinality_results = zip(column_combinations, query_to_list(count_distinct_sql)) %}
 
-        {% set results = query_to_list(count_distinct_sql) %}
+    {% set unique_keys = [] %}
+    {% for cardinality_result in cardinality_results %}
+        {% if cardinality_result[1].cardinality == table_count %}
+            {% do unique_keys.append(cardinality_result[0]) %}
+        {% endif %}
+    {% endfor %}
 
-        {% set unique_keys = [] %}
-        {% for cardinality_result in results %}
-            {% if cardinality_result.cardinality == table_count %}
-                {% do unique_keys.append(cardinality_result.colname) %}
-            {% endif %}
-        {% endfor %}
+    {{ print(unique_keys) }}
 
-        {{ print(col_test_config) }}
-
-        {% set columns_list = [] %}
-
-        {% for unique_key in unique_keys %}
+    {% set columns_list = [] %}
+    {% for unique_key in unique_keys %}
+        {% if unique_key|length == 1 %}
             {% do columns_list.append({
-                "name": unique_key,
+                "name": unique_key[0],
                 "description": "Uniqueness test generated by dbt-testgen",
                 "tests": [
-                    {   
-                        "unique": test_config
-                    },
-                    {
-                        "not_null": test_config
-                    }
+                    {"unique": test_config},
+                    {"not_null": test_config}
                 ]
             }) %}
-        {% endfor %}
+        {% else %}
+            {% do columns_list.append({
+                "name": unique_key|join("_"),
+                "description": "Uniqueness test generated by dbt-testgen",
+                "tests": [
+                    {"unique": test_config},
+                    {"not_null": test_config}
+                ]
+            }) %}
+        {% endif %}
+    {% endfor %}
 
-        {% do dbt_config["models"].append({"name": table_name, "columns": columns_list}) %}
-
-        {% do return(dbt_config) %}
-
+    {% if dbt_config == None %}
+        {% set dbt_config = {models_or_sources: []} %}
     {% endif %}
 
-{% endmacro %}
+    {% do dbt_config[models_or_sources].append({"name": table_relation.identifier, "columns": columns_list}) %}
 
-
-{% macro print_uniqueness_test_suggestions(        
-        schema_name,
-        table_name,
-        tags = ["uniqueness"],
-        dbt_config = None
-    ) 
-%}
-    {# kwargs is used for test configurations #}
-    {% set test_config = kwargs %}
-
-    {% set tests = get_uniqueness_test_suggestions(schema_name, table_name, tags, **test_config) %} 
-
-    {{ print(toyaml(tests)) }}
+    {% do return(dbt_config) %}
 
 {% endmacro %}
+
+
