@@ -6,7 +6,8 @@
 
 {{ print_uniqueness_test_suggestions(
     source('public', 'water_bodies'),
-    compound_key_length = 2,
+    compound_key_length = 3,
+    exclude_cols = ["max_latitude", "max_longitude", "min_latitude", "min_longitude"],
     is_source = true,
     enabled=true,
     tags=["a", "b"]
