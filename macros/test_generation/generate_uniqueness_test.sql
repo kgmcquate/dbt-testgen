@@ -1,73 +1,39 @@
-{% macro query_to_list(query) %}
-    {% set query_to_process %}
-        {{ query }}
-    {% endset %}
-
-    {% set results = run_query(query_to_process) %}
-
-    {% if execute %}
-    {% set results_list = results.rows %}
-    {% else %}
-    {% set results_list = [] %}
-    {% endif %}
-
-    {{ return(results_list) }}
-
-{% endmacro %}
-
-
-{% macro print_uniqueness_test_suggestions_from_name(        
-        schema_name,
-        table_name,
-        use_anchors = false,
-        is_source = false,
-        exclude_types = ["float"],
-        exclude_cols = [],
-        tags = ["uniqueness"],
-        compound_key_length = 1,
-        dbt_config = None
-    ) 
-%}
-    {% if execute %}
-        {{ print(schema_name) }}
-
-        {% set table_relation = api.Relation.create(
-            database = target.database,
-            schema = schema_name,
-            identifier = table_name
-        ) %}
-
-        {{ print(table_relation) }}
-
-        {% do print_uniqueness_test_suggestions(table_relation, use_anchors, is_source, exclude_types, exclude_cols, tags, compound_key_length, **kwargs) %} 
-
-    {% endif %}
-
+{% macro query_as_list(query) %}
+    {% set results = run_query(query) %}
+    {{ return(results.rows) }}
 {% endmacro %}
 
 
 {% macro print_uniqueness_test_suggestions(        
         table_relation,
         use_anchors = false,
+        as_json = false,
+        sample = false,
+        limit = None,
         is_source = false,
         exclude_types = ["float"],
         exclude_cols = [],
-        tags = ["uniqueness"],
+        tags = [],
         compound_key_length = 1,
         dbt_config = None
     ) 
 %}
     {% if execute %}
-        {% set tests = get_uniqueness_test_suggestions(table_relation, is_source, exclude_types, exclude_cols, tags, compound_key_length, **kwargs) %} 
+        {% set tests = testgen.get_uniqueness_test_suggestions(table_relation, sample, limit, is_source, exclude_types, exclude_cols, tags, compound_key_length, **kwargs) %} 
 
-        {% if use_anchors %}
-            {% set yaml = toyaml(tests) %}
+        {% if as_json%}
+            {% set json = tojson(tests) %}
+            {{ print(json) }}
         {% else %}
-            {# Using JSON to get rid fo the YAML anchors that toyaml puts in #}
-            {% set yaml = toyaml(fromjson(tojson(tests))) %}
-        {% endif %}
+            {% if use_anchors %}
+                {% set yaml = toyaml(tests) %}
+            {% else %}
+                {# Using JSON to get rid fo the YAML anchors that toyaml puts in #}
+                {% set yaml = toyaml(fromjson(tojson(tests))) %}
+            {% endif %}
 
-        {{ print(yaml) }}
+            {{ print(yaml) }}
+        {% endif %}
     {% endif %}
 
 {% endmacro %}
@@ -75,6 +41,8 @@
 
 {% macro get_uniqueness_test_suggestions(
         table_relation,
+        sample = false,
+        limit = None,
         is_source = false,
         exclude_types = ["float"],
         exclude_cols = [],
@@ -83,12 +51,14 @@
         dbt_config = None
     ) %}
     {# Run macro for the specific target DB #}
-    {{ return(adapter.dispatch('get_uniqueness_test_suggestions')(table_relation, is_source, exclude_types, exclude_cols, tags, compound_key_length, **kwargs)) }}
+    {{ return(adapter.dispatch('get_uniqueness_test_suggestions', 'testgen')(table_relation, sample, limit, is_source, exclude_types, exclude_cols, tags, compound_key_length, **kwargs)) }}
 {%- endmacro %}
 
 
 {% macro default__get_uniqueness_test_suggestions(
         table_relation,
+        sample = false,
+        limit = None,
         is_source = false,
         exclude_types = ["float"],
         exclude_cols = [],
@@ -122,6 +92,8 @@
                 {% do column_names.append(col.column) %}
             {% elif col.is_float() and "float" not in exclude_types %}
                 {% do column_names.append(col.column) %}
+            {% else %}
+                {% do column_names.append(col.column) %}
             {% endif %}
         {% endif %}
     {% endfor %}
@@ -132,6 +104,12 @@
             {% do column_combinations.append(col_combo) %}
         {% endfor %}
     {% endfor %}
+
+    {% if limit %}
+        {% set limit_expr = "LIMIT " ~ limit|string %}
+    {% else %}
+        {% set limit_expr = "" %}
+    {% endif %}
 
     {% set count_distinct_exprs = [] %}
     {% set i = 0 %}
@@ -150,11 +128,9 @@
         {{ "SELECT count(1) AS table_count FROM " ~ table_relation }} 
     {% endset%}
 
-    {{ print(count_distinct_sql) }}
+    {% set table_count = testgen.query_as_list(count_sql)[0].table_count %}
 
-    {% set table_count = query_to_list(count_sql)[0].table_count %}
-
-    {% set cardinality_results = zip(column_combinations, query_to_list(count_distinct_sql)) %}
+    {% set cardinality_results = zip(column_combinations, testgen.query_as_list(count_distinct_sql)) %}
 
     {% set unique_keys = [] %}
     {% for cardinality_result in cardinality_results %}
@@ -182,13 +158,9 @@
             {% set ns = namespace(already_accounted_for=false) %}
             {% for perm in permutations %}
                 {% if perm in deduped_unique_keys %}
-                    {{ print(perm) }}
                     {% set ns.already_accounted_for = true %}
-                    {# {{ print(already_accounted_for) }} #}
                 {% endif %}
             {% endfor %}
-
-            {{ print(ns.already_accounted_for) }}
 
             {% if not ns.already_accounted_for %}
                 {% do deduped_unique_keys.append(unique_key) %}
