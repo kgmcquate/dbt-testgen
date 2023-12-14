@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: public
+    tables:
+      - name: daily_weather
+      - name: daily_weather_temp
+      - name: training_waterbody_ids
+      - name: video_streams
+      - name: water_bodies
+      - name: water_body_geometries
+      - name: waterbody_satellite_images
+      - name: waterbody_weather_reports
