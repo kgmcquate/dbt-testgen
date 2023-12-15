@@ -1,3 +1,1 @@
-packages:
-  - git: "https://github.com/EqualExperts/dbt-unit-testing"
-    revision: v0.3.2
+

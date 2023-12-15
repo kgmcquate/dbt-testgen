@@ -13,7 +13,7 @@
         is_source = false,
         exclude_types = ["float"],
         exclude_cols = [],
-        tags = [],
+        tags = ["uniqueness"],
         compound_key_length = 1,
         dbt_config = None
     ) 
@@ -24,6 +24,7 @@
         {% if as_json%}
             {% set json = tojson(tests) %}
             {{ print(json) }}
+            {{ return(json)}}
         {% else %}
             {% if use_anchors %}
                 {% set yaml = toyaml(tests) %}
@@ -33,6 +34,7 @@
             {% endif %}
 
             {{ print(yaml) }}
+            {{ return(yaml) }}
         {% endif %}
     {% endif %}
 
@@ -51,7 +53,9 @@
         dbt_config = None
     ) %}
     {# Run macro for the specific target DB #}
-    {{ return(adapter.dispatch('get_uniqueness_test_suggestions', 'testgen')(table_relation, sample, limit, is_source, exclude_types, exclude_cols, tags, compound_key_length, **kwargs)) }}
+    {% if execute %}
+        {{ return(adapter.dispatch('get_uniqueness_test_suggestions', 'testgen')(table_relation, sample, limit, is_source, exclude_types, exclude_cols, tags, compound_key_length, **kwargs)) }}
+    {% endif%}
 {%- endmacro %}
 
 
@@ -67,9 +71,12 @@
         dbt_config = None
     ) 
 %}
+    {{ print(table_relation)}}
     {# kwargs is used for test configurations #}
     {% set test_config = kwargs %}
-    {% do test_config.update({"tags": tags}) %}
+    {% if tags != None %}
+        {% do test_config.update({"tags": tags}) %}
+    {% endif %}
 
     {% if is_source == true %}
         {% set models_or_sources = "sources" %}

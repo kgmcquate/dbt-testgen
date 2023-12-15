@@ -1,0 +1,20 @@
+config:
+    send_anonymous_usage_stats: False
+    use_colors: True
+
+integration_tests:
+  target: duckdb
+  outputs:
+    sqlite:
+        type: sqlite
+        threads: 1
+        database: 'database'
+        schema: 'main'
+        schemas_and_paths:
+            main: 'data/sqlite/integration_test_data.db'
+        schema_directory: 'sqlite/'
+        host: ''
+    duckdb:
+      type: duckdb
+      path: 'data/duckdb/integration_test_data.duckdb'
+    
