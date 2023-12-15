@@ -1,17 +1,13 @@
+# dbt-testgen
 
+dbt-testgen autogenerates dbt test yaml based on real data.
 
-dbt package
-## Ideas
-Web UI
-- Accept or reject tests
+Inspired by [dbt-codegen]() and [deequ Constraint Suggestion](https://github.com/awslabs/deequ/blob/master/src/main/scala/com/amazon/deequ/examples/constraint_suggestion_example.md)
 
-Warn vs fail tests
-Statistical tests
-
-## test types
-uniqueness
-string length
-range
-not_null
-accepted_values 
-
+## Test types
+- uniqueness
+- not_null
+- string length
+- range
+- accepted_values 
+- freshness
