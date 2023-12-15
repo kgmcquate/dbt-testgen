@@ -26,6 +26,9 @@ jobs:
     - name: pip install
       run: pip install dbt-core duckdb dbt-duckdb
 
+    - name: Install DBT deps
+      run: dbt deps
+      
     - name: load test data
       run: dbt seed
 
