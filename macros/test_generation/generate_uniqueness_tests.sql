@@ -1,9 +1,3 @@
-{% macro query_as_list(query) %}
-    {% set results = run_query(query) %}
-    {{ return(results.rows) }}
-{% endmacro %}
-
-
 {% macro print_uniqueness_test_suggestions(        
         table_relation,
         use_anchors = false,
@@ -99,7 +93,7 @@
                 {% do column_names.append(col.column) %}
             {% elif col.is_float() and "float" not in exclude_types %}
                 {% do column_names.append(col.column) %}
-            {% else %}
+            {% elif col.column not in exclude_cols %}
                 {% do column_names.append(col.column) %}
             {% endif %}
         {% endif %}
@@ -119,7 +113,6 @@
     {% endif %}
 
     {% set count_distinct_exprs = [] %}
-    {% set i = 0 %}
     {% for column_combo in column_combinations %}
         {% do count_distinct_exprs.append(
             "SELECT " ~ loop.index ~ " AS ordering, count(1) AS cardinality from (SELECT 1 FROM " ~ table_relation ~ " GROUP BY " ~ column_combo|join(", ") ~ ") t"
