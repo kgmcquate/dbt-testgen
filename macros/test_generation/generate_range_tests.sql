@@ -27,8 +27,6 @@
         dbt_config = None
     ) 
 %}
-
-    {{ print(table_relation) }}
     {# kwargs is used for test configurations #}
     {% set test_config = kwargs %}
     {% if tags != None %}
@@ -51,9 +49,6 @@
             {% do number_cols.append(column) %}
         {% endif %}
     {% endfor %}
-
-    {{ print(number_cols) }}
-
 
     {% set min_max_exprs = [] %}
     {% for column in number_cols %}
