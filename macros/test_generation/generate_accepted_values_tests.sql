@@ -38,7 +38,6 @@
         dbt_config = None
     ) 
 %}
-    {{ print(table_relation)}}
     {# kwargs is used for test configurations #}
     {% set test_config = kwargs %}
     {% if tags != None %}
@@ -69,8 +68,6 @@
             "
         ) %}
     {% endfor %}
-
-    {{ print(max_cardinality) }}
 
     {% set count_distinct_sql %}
         SELECT * FROM (

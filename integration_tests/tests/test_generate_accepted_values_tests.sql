@@ -1,13 +1,13 @@
 
 
-{% set actual_model_yaml = toyaml(fromjson(tojson(
+{% set actual_yaml = toyaml(fromjson(tojson(
         testgen.get_accepted_values_test_suggestions(
             ref('users')
         )
     )))
 %}
 
-{% set expected_model_yaml %}
+{% set expected_yaml %}
 models:
 - name: users
   columns:
@@ -20,4 +20,4 @@ models:
         - inactive
 {% endset %}
 
-{{ assert_equal (actual_model_yaml | trim, expected_model_yaml | trim) }}
+{{ assert_equal (actual_yaml | trim, expected_yaml | trim) }}

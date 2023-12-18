@@ -1,12 +1,12 @@
 
 
-{% set actual_model_yaml = testgen.print_uniqueness_test_suggestions(
+{% set actual_yaml = testgen.print_uniqueness_test_suggestions(
         ref('users'),
         compound_key_length = 1
     )
 %}
 
-{% set expected_model_yaml %}
+{% set expected_yaml %}
 models:
 - name: users
   tests: []
@@ -40,4 +40,4 @@ models:
         - uniqueness
 {% endset %}
 
-{{ assert_equal (actual_model_yaml | trim, expected_model_yaml | trim) }}
+{{ assert_equal (actual_yaml | trim, expected_yaml | trim) }}

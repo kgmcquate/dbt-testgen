@@ -1,1 +1,1 @@
-docker run -it -v ${PWD}:/run/dbt-testgen dbt-testgen-integration0test bash
+docker run -it -v ${PWD}:/run/dbt-testgen dbt-testgen-integration-test bash

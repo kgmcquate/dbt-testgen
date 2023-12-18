@@ -11,3 +11,16 @@ Inspired by [dbt-codegen]() and [deequ Constraint Suggestion](https://github.com
 - range
 - accepted_values 
 - freshness
+
+### Uniqueness
+
+### Not null
+
+### String length
+
+### Range
+
+### Mean and stddev
+
+
+###
