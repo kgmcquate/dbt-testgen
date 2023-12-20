@@ -2,7 +2,7 @@ name: Test DBT package
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "develop" ]
 
 permissions:
   contents: read
