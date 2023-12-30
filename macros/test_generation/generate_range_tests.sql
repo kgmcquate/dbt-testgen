@@ -11,7 +11,7 @@
     ) %}
     {# Run macro for the specific target DB #}
     {% if execute %}
-        {{ return(adapter.dispatch('get_range_test_suggestions', 'testgen')(table_relation, sample, limit, is_source, exclude_types, exclude_cols, tags, **kwargs)) }}
+        {{ return(adapter.dispatch('get_range_test_suggestions', 'testgen')(table_relation, sample, limit, is_source, exclude_types, exclude_cols, tags, dbt_config, **kwargs)) }}
     {% endif%}
 {%- endmacro %}
 
@@ -54,8 +54,8 @@
     {% for column in number_cols %}
         {% do min_max_exprs.append(
             "SELECT '" ~ column.column ~ "' AS colname, " ~ 
-                "MIN(" ~ column.column ~ ") as col_min, " ~ 
-                "MAX(" ~ column.column ~ ") as col_max " ~ 
+                "MIN(" ~ adapter.quote(column.column) ~ ") as col_min, " ~ 
+                "MAX(" ~ adapter.quote(column.column) ~ ") as col_max " ~ 
             "FROM " ~ table_relation
         ) %}
     {% endfor %}
@@ -86,9 +86,13 @@
         ) %}
     {% endfor %}
 
+    {{ print(dbt_config) }}
+
     {% if dbt_config == None %}
         {% set dbt_config = {models_or_sources: []} %}
     {% endif %}
+
+    {{ print(dbt_config) }}
 
     {% do dbt_config[models_or_sources].append({"name": table_relation.identifier, "columns": column_tests}) %}
 

@@ -3,7 +3,7 @@
 {% endmacro %}
 
 {% macro default__array_agg(colname) %}
-    {{ return("array_agg(" ~ colname ~ "::VARCHAR)") }}
+    {{ return("array_agg(" ~ adapter.quote(colname) ~ "::VARCHAR)") }}
 {% endmacro %}
 
 
@@ -21,7 +21,7 @@
     ) %}
     {# Run macro for the specific target DB #}
     {% if execute %}
-        {{ return(adapter.dispatch('get_accepted_values_test_suggestions', 'testgen')(table_relation, sample, limit, is_source, exclude_types, exclude_cols, tags, max_cardinality, **kwargs)) }}
+        {{ return(adapter.dispatch('get_accepted_values_test_suggestions', 'testgen')(table_relation, sample, limit, is_source, exclude_types, exclude_cols, tags, max_cardinality, dbt_config, **kwargs)) }}
     {% endif%}
 {%- endmacro %}
 
@@ -61,9 +61,9 @@
             select '" ~ column.column ~ "' AS colname, count(1) as cardinality, " ~ 
             testgen.array_agg(column.column) ~ " AS unique_values 
             from (
-                select " ~ column.column ~ "
+                select " ~ adapter.quote(column.column) ~ "
                 from " ~ table_relation ~ "
-                group by " ~ column.column ~ "
+                group by " ~ adapter.quote(column.column) ~ "
             ) t1
             "
         ) %}
@@ -94,9 +94,36 @@
         {% set dbt_config = {models_or_sources: []} %}
     {% endif %}
 
+    {{ print(dbt_config) }}
+
     {% do dbt_config[models_or_sources].append({"name": table_relation.identifier, "columns": column_tests}) %}
 
     {% do return(dbt_config) %}
 
 {% endmacro %}
 
+
+
+
+{# {% for model_1 in config_1[model_type] %}
+                {% for model_2 in config_2[model_type] %}
+                    {% if model_1["name"] == model_2["name"] %}
+                        {% set merged_columns = [] %}
+                        {% for col_1 in model_1["columns"] %}
+                            {% for col_2 in model_2["columns"] %}
+                                {% if col_1 == col_2 %}
+                                    {% set merged_col = {
+                                        "name": model_1["name"], 
+                                        "tests": col_1["tests"] + col_2["tests"]
+                                    } 
+                                    %}
+                                    
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                        {% do dbt_config[model_type].append({"name": , "columns": merged_columns}) %}
+                    {% else %}
+
+                    {% endif %}
+                {% endfor %}
+            {% endfor %} #}

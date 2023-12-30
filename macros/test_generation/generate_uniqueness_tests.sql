@@ -13,7 +13,7 @@
     ) 
 %}
     {% if execute %}
-        {% set tests = testgen.get_uniqueness_test_suggestions(table_relation, sample, limit, is_source, exclude_types, exclude_cols, tags, compound_key_length, **kwargs) %} 
+        {% set tests = testgen.get_uniqueness_test_suggestions(table_relation, sample, limit, is_source, exclude_types, exclude_cols, tags, compound_key_length, dbt_config, **kwargs) %} 
 
         {% if as_json%}
             {% set json = tojson(tests) %}
@@ -48,7 +48,7 @@
     ) %}
     {# Run macro for the specific target DB #}
     {% if execute %}
-        {{ return(adapter.dispatch('get_uniqueness_test_suggestions', 'testgen')(table_relation, sample, limit, is_source, exclude_types, exclude_cols, tags, compound_key_length, **kwargs)) }}
+        {{ return(adapter.dispatch('get_uniqueness_test_suggestions', 'testgen')(table_relation, sample, limit, is_source, exclude_types, exclude_cols, tags, compound_key_length, dbt_config, **kwargs)) }}
     {% endif%}
 {%- endmacro %}
 
