@@ -91,12 +91,15 @@
     {% endfor %}
 
     {% if dbt_config == None %}
-        {% set dbt_config = {models_or_sources: []} %}
+        {% set new_dbt_config = testgen.merge_dbt_configs(
+            dbt_config, 
+            {models_or_sources: [{"name": table_relation.identifier, "columns": column_tests}]}) 
+        %}
     {% endif %}
 
     {{ print(dbt_config) }}
-
-    {% do dbt_config[models_or_sources].append({"name": table_relation.identifier, "columns": column_tests}) %}
+{# 
+    {% do dbt_config[models_or_sources].append({"name": table_relation.identifier, "columns": column_tests}) %} #}
 
     {% do return(dbt_config) %}
 
