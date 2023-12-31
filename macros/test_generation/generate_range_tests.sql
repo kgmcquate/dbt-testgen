@@ -29,9 +29,9 @@
 %}
     {# kwargs is used for test configurations #}
     {% set test_config = kwargs %}
-    {% if tags != None %}
+    {# {% if tags != None %}
         {% do test_config.update({"tags": tags}) %}
-    {% endif %}
+    {% endif %} #}
 
     {% if is_source == true %}
         {% set models_or_sources = "sources" %}
@@ -86,17 +86,11 @@
         ) %}
     {% endfor %}
 
-    {{ print(dbt_config) }}
+    {% set new_dbt_config = {models_or_sources: [{"name": table_relation.identifier, "columns": column_tests}]} %}
 
-    {% if dbt_config == None %}
-        {% set dbt_config = {models_or_sources: []} %}
-    {% endif %}
+    {% set merged_dbt_config = testgen.merge_dbt_configs(dbt_config, new_dbt_config) %}
 
-    {{ print(dbt_config) }}
-
-    {% do dbt_config[models_or_sources].append({"name": table_relation.identifier, "columns": column_tests}) %}
-
-    {% do return(dbt_config) %}
+    {% do return(merged_dbt_config) %}
 
 {% endmacro %}
 

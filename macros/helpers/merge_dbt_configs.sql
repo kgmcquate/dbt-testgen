@@ -2,11 +2,11 @@
 
 {% macro merge_dbt_configs(dbt_config_1, dbt_config_2) %}
     {% if dbt_config_1 == None %}
-        {{ return(config_2) }}
+        {{ return(dbt_config_2) }}
     {% endif %}
 
     {% if dbt_config_2 == None %}
-        {{ return(config_1) }}
+        {{ return(dbt_config_1) }}
     {% endif %}
 
     {% set new_config = {} %}
@@ -89,12 +89,12 @@
                     {% endfor %}
                 {% endif %}
 
-                {% do new_models.append({
-                        "name": model_name,
-                        "tests": model_tests,
-                        "columns": new_columns
-                    })
-                %}
+                {% set model = {"name": model_name, "columns": new_columns} %}
+                {% if model_tests != [] %}
+                    {% do model.update({"tests": model_tests})%}
+                {% endif %}
+                
+                {% do new_models.append(model)%}
             {% endfor %}
         {% do new_config.update({model_type: new_models}) %}
         {% endif %}

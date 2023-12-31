@@ -40,7 +40,6 @@ models:
 {% set expected_yaml %}
 models:
 - name: users
-  tests: []
   columns:
   - name: user_id
     tests:
