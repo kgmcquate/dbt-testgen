@@ -11,7 +11,7 @@
     ) %}
     {# Run macro for the specific target DB #}
     {% if execute %}
-        {{ return(adapter.dispatch('get_range_test_suggestions', 'testgen')(table_relation, sample, limit, is_source, exclude_types, exclude_cols, tags, **kwargs)) }}
+        {{ return(adapter.dispatch('get_range_test_suggestions', 'testgen')(table_relation, sample, limit, is_source, exclude_types, exclude_cols, tags, dbt_config, **kwargs)) }}
     {% endif%}
 {%- endmacro %}
 
@@ -29,9 +29,9 @@
 %}
     {# kwargs is used for test configurations #}
     {% set test_config = kwargs %}
-    {% if tags != None %}
+    {# {% if tags != None %}
         {% do test_config.update({"tags": tags}) %}
-    {% endif %}
+    {% endif %} #}
 
     {% if is_source == true %}
         {% set models_or_sources = "sources" %}
@@ -54,8 +54,8 @@
     {% for column in number_cols %}
         {% do min_max_exprs.append(
             "SELECT '" ~ column.column ~ "' AS colname, " ~ 
-                "MIN(" ~ column.column ~ ") as col_min, " ~ 
-                "MAX(" ~ column.column ~ ") as col_max " ~ 
+                "MIN(" ~ adapter.quote(column.column) ~ ") as col_min, " ~ 
+                "MAX(" ~ adapter.quote(column.column) ~ ") as col_max " ~ 
             "FROM " ~ table_relation
         ) %}
     {% endfor %}
@@ -86,13 +86,11 @@
         ) %}
     {% endfor %}
 
-    {% if dbt_config == None %}
-        {% set dbt_config = {models_or_sources: []} %}
-    {% endif %}
+    {% set new_dbt_config = {models_or_sources: [{"name": table_relation.identifier, "columns": column_tests}]} %}
 
-    {% do dbt_config[models_or_sources].append({"name": table_relation.identifier, "columns": column_tests}) %}
+    {% set merged_dbt_config = testgen.merge_dbt_configs(dbt_config, new_dbt_config) %}
 
-    {% do return(dbt_config) %}
+    {% do return(merged_dbt_config) %}
 
 {% endmacro %}
 
