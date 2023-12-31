@@ -58,8 +58,10 @@
     {% for column in columns %}
         {% do count_distinct_exprs.append(
             "
-            select '" ~ column.column ~ "' AS colname, count(1) as cardinality, " ~ 
-            testgen.array_agg(column.column) ~ " AS unique_values 
+            select " ~ loop.index ~ " AS ordering, 
+                '" ~ column.column ~ "' AS colname, 
+                count(1) as cardinality, " ~ 
+                testgen.array_agg(column.column) ~ " AS unique_values 
             from (
                 select " ~ adapter.quote(column.column) ~ "
                 from " ~ table_relation ~ "
@@ -74,6 +76,7 @@
             {{ count_distinct_exprs | join("\nUNION ALL\n") }}
         ) t2
         WHERE cardinality <= {{ max_cardinality|string }}
+        ORDER BY ordering ASC
     {% endset %}
 
     {% set cardinality_results = testgen.query_as_list(count_distinct_sql) %}

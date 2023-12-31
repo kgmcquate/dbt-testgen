@@ -15,7 +15,7 @@ jobs:
   test-duckdb:
     name: Test on DuckDB
     runs-on: ubuntu-latest
-    environment: production
+    #environment: production
     container:
       image: python:3.11
 
@@ -38,7 +38,7 @@ jobs:
   test-postgres:
     name: Test on Postgres
     runs-on: ubuntu-latest
-    environment: production
+    #environment: production
     container:
       image: python:3.11
 
