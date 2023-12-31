@@ -17,4 +17,4 @@ clean-targets:
 
 seeds:
   +schema: integration_test_data
-  +quote_columns: false
+  +quote_columns: true
