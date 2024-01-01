@@ -82,11 +82,15 @@
 
     {% set count_distinct_exprs = [] %}
     {% for column_combo in column_combinations %}
+        {% set column_combo_quoted = [] %}
+        {% for col in column_combo %}
+            {% do column_combo_quoted.append(adapter.quote(col))%}
+        {% endfor %}
         {% do count_distinct_exprs.append(
             "SELECT " ~ loop.index ~ " AS ordering, count(1) AS cardinality 
             from (
                 SELECT 1 FROM " ~ table_relation ~ " 
-                GROUP BY " ~ column_combo|join(", ") ~ "
+                GROUP BY " ~ column_combo_quoted|join(", ") ~ "
             ) t"
         ) %}
     {% endfor %}
