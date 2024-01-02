@@ -25,3 +25,16 @@ integration_tests:
       port: 5432
       dbname: postgres # or database instead of dbname
       schema: public
+    snowflake:
+      type: snowflake
+      account: ircmtcn-ekb34223
+      # User/password auth
+      user: dbt_testgen
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: dbt_testgen
+      database: dbt_testgen
+      warehouse: dbt_testgen
+      schema: dbt_testgen
+      threads: 1
+      client_session_keep_alive: False
+      query_tag: dbt_testgen

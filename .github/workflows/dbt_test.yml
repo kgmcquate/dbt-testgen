@@ -55,13 +55,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
 
     - name: pip install
-      run: pip install dbt-core duckdb dbt-postgres
+      run: pip install dbt-core dbt-postgres
 
     - name: Install DBT deps
       run: dbt deps --target postgres
@@ -71,3 +67,27 @@ jobs:
 
     - name: dbt test
       run: dbt test --target postgres
+
+  test-snowflake:
+    name: Test on Snowflake
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.11
+
+    env:
+      SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: pip install
+      run: pip install dbt-core dbt-snowflake
+
+    - name: Install DBT deps
+      run: dbt deps --target snowflake
+      
+    - name: load test data
+      run: dbt seed --target snowflake
+
+    - name: dbt test
+      run: dbt test --target snowflake
