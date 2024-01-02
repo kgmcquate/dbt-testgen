@@ -69,8 +69,5 @@ jobs:
     - name: load test data
       run: dbt seed --target postgres
 
-    - name: Create seed tests
-      run: bash tests/create_seeds_tests_yml.sh
-
     - name: dbt test
       run: dbt test --target postgres
