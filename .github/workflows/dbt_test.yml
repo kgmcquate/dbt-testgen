@@ -47,9 +47,8 @@ jobs:
   test-postgres:
     name: Test on Postgres
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+    container:
+      image: python:3.11
 
     services:
       postgres:
