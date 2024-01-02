@@ -34,7 +34,7 @@ integration_tests:
       role: DBT_TESTGEN
       database: DBT_TESTGEN
       warehouse: DBT_TESTGEN
-      schema: DBT_TESTGEN_INTEGRATION_TEST_DATA
+      schema: DBT_TESTGEN
       threads: 1
       client_session_keep_alive: False
       query_tag: DBT_TESTGEN
