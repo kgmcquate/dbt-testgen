@@ -35,10 +35,10 @@ jobs:
     - name: load test data
       run: dbt seed --target duckdb
 
-    - name: Generate tests
+    - name: Create seed tests
       run: dbt compile -q --inline "{{ testgen.get_test_suggestions(ref('users'), resource_type='seeds') }}" > seeds/users_test_suggestions.yml
 
-    - name: Generate tests
+    - name: Create seed tests
       run: "dbt compile -q --inline \"{{ testgen.get_test_suggestions(ref('colnames_with_spaces'), resource_type='seeds', column_config={'quote': true}) }}\"  > seeds/colnames_with_spaces_test_suggestions.yml"
 
     - name: dbt test

@@ -1,11 +1,11 @@
 
 
-{% set actual_yaml = toyaml(fromjson(tojson(
+{% set actual_yaml = testgen.to_yaml(
         testgen.get_uniqueness_test_suggestions(
             ref('users'),
             composite_key_length = 1
         )
-    )))
+    )
 %}
 
 {% set expected_yaml %}
