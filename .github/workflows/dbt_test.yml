@@ -7,28 +7,22 @@ on:
 permissions:
   contents: read
 
-
 jobs:
-  setup-testing:
+  test-duckdb:
+    name: Test on DuckDB
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-      - run: cd integration_tests/
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - run: cd integration_tests/
 
-  test-duckdb:
-    name: Test on DuckDB
-    runs-on: ubuntu-latest
-    needs: setup-testing
-
-    steps:
     - name: pip install
       run: pip install dbt-core duckdb dbt-duckdb
 
@@ -50,7 +44,9 @@ jobs:
   test-postgres:
     name: Test on Postgres
     runs-on: ubuntu-latest
-    needs: setup-testing
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     services:
       postgres:
@@ -59,6 +55,12 @@ jobs:
           POSTGRES_PASSWORD: postgres
 
     steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - run: cd integration_tests/
     - name: pip install
       run: pip install dbt-core duckdb dbt-postgres
 
