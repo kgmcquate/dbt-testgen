@@ -1,10 +1,11 @@
 
 
-{% set actual_yaml = toyaml(fromjson(tojson(
+{% set actual_yaml = testgen.to_yaml(
         testgen.get_test_suggestions(
-            ref('users')
+            ref('users'),
+            return_object=true
         )
-    )))
+    )
 %}
 
 {% set expected_yaml %}

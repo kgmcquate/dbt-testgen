@@ -3,7 +3,7 @@
 {% set actual_yaml = toyaml(fromjson(tojson(
         testgen.get_uniqueness_test_suggestions(
             ref('colnames_with_spaces'),
-            compound_key_length = 1
+            composite_key_length = 1
         )
     )))
 %}

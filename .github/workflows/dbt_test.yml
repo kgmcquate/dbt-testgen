@@ -12,17 +12,25 @@ defaults:
     working-directory: integration_tests
 
 jobs:
+  setup-testing:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
   test-duckdb:
     name: Test on DuckDB
     runs-on: ubuntu-latest
-    #environment: production
-    container:
-      image: python:3.11
+    needs: setup-testing
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
     - name: pip install
       run: pip install dbt-core duckdb dbt-duckdb
 
@@ -32,30 +40,27 @@ jobs:
     - name: load test data
       run: dbt seed --target duckdb
 
+    - name: Generate tests
+      run: dbt compile -q --inline "{{ testgen.get_test_suggestions(ref('users'), resource_type='seeds') }}" > seeds/users_test_suggestions.yml
+
+    - name: Generate tests
+      run: dbt compile -q --inline "{{ testgen.get_test_suggestions(ref('colnames_with_spaces'), resource_type='seeds') }}"  > seeds/colnames_with_spaces_test_suggestions.yml
+
     - name: dbt test
       run: dbt test --target duckdb
 
   test-postgres:
     name: Test on Postgres
     runs-on: ubuntu-latest
-    #environment: production
-    container:
-      image: python:3.11
+    needs: setup-testing
 
-    # Service containers to run with `container-job`
     services:
-      # Label used to access the service container
       postgres:
-        # Docker Hub image
         image: postgres
-        # Provide the password for postgres
         env:
           POSTGRES_PASSWORD: postgres
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
     - name: pip install
       run: pip install dbt-core duckdb dbt-postgres
 
@@ -67,6 +72,3 @@ jobs:
 
     - name: dbt test
       run: dbt test --target postgres
-
-
-      
