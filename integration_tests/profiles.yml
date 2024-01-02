@@ -29,12 +29,12 @@ integration_tests:
       type: snowflake
       account: ircmtcn-ekb34223
       # User/password auth
-      user: dbt_testgen
+      user: DBT_TESTGEN
       password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
-      role: dbt_testgen
-      database: dbt_testgen
-      warehouse: dbt_testgen
-      schema: dbt_testgen
+      role: DBT_TESTGEN
+      database: DBT_TESTGEN
+      warehouse: DBT_TESTGEN
+      schema: DBT_TESTGEN_INTEGRATION_TEST_DATA
       threads: 1
       client_session_keep_alive: False
-      query_tag: dbt_testgen
+      query_tag: DBT_TESTGEN
