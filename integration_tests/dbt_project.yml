@@ -4,8 +4,6 @@ config-version: 2
 
 profile: 'integration_tests'
 
-model-paths: ["models"]
-analysis-paths: ["analyses"]
 test-paths: ["tests"]
 seed-paths: ["seeds"]
 macro-paths: ["macros"]
@@ -18,3 +16,4 @@ clean-targets:
 seeds:
   +schema: integration_test_data
   +quote_columns: true
+

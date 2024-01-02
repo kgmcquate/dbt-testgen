@@ -12,31 +12,31 @@
     {% set new_config = {} %}
 
     {# Want to preserve ordering, so don't use sets #}
-    {% set model_types = [] %}
-    {% for model_type in dbt_config_1.keys()|list + dbt_config_2.keys()|list %}
-        {% if model_type not in model_types %}
-            {% do model_types.append(model_type) %}
+    {% set resource_types = [] %}
+    {% for resource_type in dbt_config_1.keys()|list + dbt_config_2.keys()|list %}
+        {% if resource_type not in resource_types %}
+            {% do resource_types.append(resource_type) %}
         {% endif %}
     {% endfor %}
 
-    {% for model_type in model_types %}
-        {% do new_config.update({model_type: []}) %}
+    {% for resource_type in resource_types %}
+        {% do new_config.update({resource_type: []}) %}
 
-        {% if model_type not in dbt_config_1.keys() %}
-            {% do new_config.update({model_type: dbt_config_2[model_type]}) %}
-        {% elif model_type not in dbt_config_2.keys() %}
-            {% do new_config.update({model_type: dbt_config_1[model_type]}) %}
+        {% if resource_type not in dbt_config_1.keys() %}
+            {% do new_config.update({resource_type: dbt_config_2[resource_type]}) %}
+        {% elif resource_type not in dbt_config_2.keys() %}
+            {% do new_config.update({resource_type: dbt_config_1[resource_type]}) %}
         {% else %}
             {% set model_names = [] %}
 
             {% set config_1_model_lookup = {} %}
-            {% for model in dbt_config_1[model_type] %}
+            {% for model in dbt_config_1[resource_type] %}
                 {% do model_names.append(model["name"]) %}
                 {% do config_1_model_lookup.update({model["name"]: model}) %}
             {% endfor %}
 
             {% set config_2_model_lookup = {} %}
-            {% for model in dbt_config_2[model_type] %}
+            {% for model in dbt_config_2[resource_type] %}
                 {% if model["name"] not in model_names %}
                     {% do model_names.append(model["name"]) %}
                 {% endif %}
@@ -63,18 +63,30 @@
 
                 {% set new_columns = [] %}
                 {% for col_name in col_names %}
+                    {% set new_column = {
+                            "name": col_name
+                        }
+                    %}
                     {% if col_name not in config_1_col_lookup.keys() %}
+                        {% for k, v in config_2_col_lookup[col_name].items() %}
+                            {% do new_column.update({k: v}) %}
+                        {% endfor %}
                         {% set col_tests = config_2_col_lookup[col_name]["tests"] %}
                     {% elif col_name not in config_2_col_lookup.keys() %}
+                        {% for k, v in config_1_col_lookup[col_name].items() %}
+                            {% do new_column.update({k: v}) %}
+                        {% endfor %}
                         {% set col_tests = config_1_col_lookup[col_name]["tests"] %}
                     {% else %}
+                        {% for k, v in config_1_col_lookup[col_name].items()|list + config_2_col_lookup[col_name].items()|list %}
+                            {% do new_column.update({k: v}) %}
+                        {% endfor %}
                         {% set col_tests = config_1_col_lookup[col_name]["tests"] + config_2_col_lookup[col_name]["tests"] %}
                     {% endif %}
-                    {% do new_columns.append({
-                            "name": col_name,
-                            "tests": col_tests
-                        })
-                    %}
+
+                    {% do new_column.update({"tests": col_tests}) %}
+
+                    {% do new_columns.append(new_column) %}
                 {% endfor %}
 
                 {% set model_tests = [] %}
@@ -96,7 +108,7 @@
                 
                 {% do new_models.append(model)%}
             {% endfor %}
-        {% do new_config.update({model_type: new_models}) %}
+        {% do new_config.update({resource_type: new_models}) %}
         {% endif %}
     {% endfor %}
 
