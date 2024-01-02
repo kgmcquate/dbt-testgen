@@ -63,18 +63,30 @@
 
                 {% set new_columns = [] %}
                 {% for col_name in col_names %}
+                    {% set new_column = {
+                            "name": col_name
+                        }
+                    %}
                     {% if col_name not in config_1_col_lookup.keys() %}
+                        {% for k, v in config_2_col_lookup[col_name].items() %}
+                            {% do new_column.update({k: v}) %}
+                        {% endfor %}
                         {% set col_tests = config_2_col_lookup[col_name]["tests"] %}
                     {% elif col_name not in config_2_col_lookup.keys() %}
+                        {% for k, v in config_1_col_lookup[col_name].items() %}
+                            {% do new_column.update({k: v}) %}
+                        {% endfor %}
                         {% set col_tests = config_1_col_lookup[col_name]["tests"] %}
                     {% else %}
+                        {% for k, v in config_1_col_lookup[col_name].items()|list + config_2_col_lookup[col_name].items()|list %}
+                            {% do new_column.update({k: v}) %}
+                        {% endfor %}
                         {% set col_tests = config_1_col_lookup[col_name]["tests"] + config_2_col_lookup[col_name]["tests"] %}
                     {% endif %}
-                    {% do new_columns.append({
-                            "name": col_name,
-                            "tests": col_tests
-                        })
-                    %}
+
+                    {% do new_column.update({"tests": col_tests}) %}
+
+                    {% do new_columns.append(new_column) %}
                 {% endfor %}
 
                 {% set model_tests = [] %}
