@@ -6,6 +6,7 @@
         sample = false,
         limit = None,
         resource_type = "models",
+        column_config = {},
         exclude_types = ["float"],
         exclude_cols = [],
         tags = ["uniqueness"],
@@ -15,7 +16,7 @@
     {# Run macro for the specific target DB #}
     {% if execute %}
         {{ return(
-            adapter.dispatch('get_uniqueness_test_suggestions', 'testgen')(table_relation, sample, limit, resource_type, exclude_types, exclude_cols, tags, composite_key_length, dbt_config, **kwargs)
+            adapter.dispatch('get_uniqueness_test_suggestions', 'testgen')(table_relation, sample, limit, resource_type, column_config, exclude_types, exclude_cols, tags, composite_key_length, dbt_config, **kwargs)
         ) }}
     {% endif %}
 {% endmacro %}
@@ -26,6 +27,7 @@
         sample = false,
         limit = None,
         resource_type = "models",
+        column_config = {},
         exclude_types = ["float"],
         exclude_cols = [],
         tags = ["uniqueness"],

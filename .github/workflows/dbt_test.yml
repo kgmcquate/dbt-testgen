@@ -63,7 +63,7 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    - run: cd integration_tests/
+        
     - name: pip install
       run: pip install dbt-core duckdb dbt-postgres
 
