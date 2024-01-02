@@ -31,7 +31,7 @@ integration_tests:
       # User/password auth
       user: dbt_testgen
       password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
-      #role: dbt_testgen
+      role: dbt_testgen
       database: dbt_testgen
       warehouse: dbt_testgen
       schema: dbt_testgen
