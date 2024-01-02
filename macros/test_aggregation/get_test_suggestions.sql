@@ -3,12 +3,15 @@
         table_relation,
         sample = false,
         limit = None,
-        is_source = false,
+        resource_type = "models",
+        column_config = {},
         exclude_types = [],
         exclude_cols = [],
         tags = [],
         tests = ["uniqueness", "accepted_values", "range"],
-        dbt_config = None
+        composite_key_length = 1,
+        dbt_config = None,
+        return_object = false
     ) %}
     {# Run macro for the specific target DB #}
     {% if execute %}
@@ -17,10 +20,12 @@
                 table_relation=table_relation,
                 sample=sample,
                 limit=limit,
-                is_source=is_source,
+                resource_type=resource_type,
+                column_config=column_config,
                 exclude_types=exclude_types,
                 exclude_cols=exclude_cols,
                 tags=tags,
+                composite_key_length=composite_key_length,
                 dbt_config=dbt_config
             ) %}
         {% endif %}
@@ -30,7 +35,8 @@
                 table_relation=table_relation,
                 sample=sample,
                 limit=limit,
-                is_source=is_source,
+                resource_type=resource_type,
+                column_config=column_config,
                 exclude_types=exclude_types,
                 exclude_cols=exclude_cols,
                 tags=tags,
@@ -43,7 +49,8 @@
                 table_relation=table_relation,
                 sample=sample,
                 limit=limit,
-                is_source=is_source,
+                resource_type=resource_type,
+                column_config=column_config,
                 exclude_types=exclude_types,
                 exclude_cols=exclude_cols,
                 tags=tags,
@@ -51,7 +58,10 @@
             ) %}
         {% endif %}
 
-        {{ return(dbt_config) }}
-
+        {% if return_object %}
+            {{ return(dbt_config) }}
+        {% else %}
+            {{ print(testgen.to_yaml(dbt_config)) }}
+        {% endif %}
     {% endif %}
 {%- endmacro %}

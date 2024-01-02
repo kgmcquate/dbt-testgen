@@ -15,13 +15,16 @@ jobs:
   test-duckdb:
     name: Test on DuckDB
     runs-on: ubuntu-latest
-    #environment: production
-    container:
-      image: python:3.11
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
 
     - name: pip install
       run: pip install dbt-core duckdb dbt-duckdb
@@ -32,29 +35,30 @@ jobs:
     - name: load test data
       run: dbt seed --target duckdb
 
+    - name: Create seed tests
+      run: bash tests/create_seeds_tests_yml.sh
+
     - name: dbt test
       run: dbt test --target duckdb
 
   test-postgres:
     name: Test on Postgres
     runs-on: ubuntu-latest
-    #environment: production
     container:
       image: python:3.11
 
-    # Service containers to run with `container-job`
     services:
-      # Label used to access the service container
       postgres:
-        # Docker Hub image
         image: postgres
-        # Provide the password for postgres
         env:
           POSTGRES_PASSWORD: postgres
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
 
     - name: pip install
       run: pip install dbt-core duckdb dbt-postgres
@@ -67,6 +71,3 @@ jobs:
 
     - name: dbt test
       run: dbt test --target postgres
-
-
-      

@@ -1,10 +1,10 @@
 
 
-{% set actual_yaml = toyaml(fromjson(tojson(
+{% set actual_yaml = testgen.to_yaml(
         testgen.get_accepted_values_test_suggestions(
             ref('colnames_with_spaces')
         )
-    )))
+    )
 %}
 
 {% set expected_yaml %}
