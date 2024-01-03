@@ -140,7 +140,7 @@ jobs:
       image: python:3.11
 
     env:
-      GCP_KEYFILE: ${{ secrets.GCP_KEYFILE }}
+      GCP_KEYFILE: "${{ secrets.GCP_KEYFILE }}"
       DBT_TARGET: bigquery
 
     steps:
