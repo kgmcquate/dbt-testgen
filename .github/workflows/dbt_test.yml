@@ -149,7 +149,7 @@ jobs:
       id: create-json
       uses: jsdaniell/create-json@1.1.2
       with:
-        name: "gcp_keyfile.json"
+        name: "integration_tests/gcp_keyfile.json"
         json: ${{ secrets.GCP_KEYFILE }}
 
     #- run: echo '${{ secrets.GCP_KEYFILE }}' > gcp_keyfile.json
