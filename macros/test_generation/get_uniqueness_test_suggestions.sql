@@ -100,7 +100,7 @@
         {{ "SELECT count(1) AS TABLE_COUNT FROM " ~ table_relation }} 
     {% endset%}
 
-    {% set table_count = testgen.query_as_list(count_sql)[0].TABLE_COUNT %}
+    {% set table_count = testgen.query_as_list(count_sql)[0][0] %}
 
     {% set cardinality_results = zip(column_combinations, testgen.query_as_list(count_distinct_sql)) %}
 
@@ -109,7 +109,7 @@
 
     {% set unique_keys = [] %}
     {% for cardinality_result in cardinality_results %}
-        {% if cardinality_result[1].CARDINALITY == table_count %}
+        {% if cardinality_result[1][1] == table_count %}
             {# {{ print(cardinality_result) }} #}
             {% do unique_keys.append(cardinality_result[0]) %}
         {% endif %}
