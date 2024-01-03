@@ -23,6 +23,12 @@ models:
         max_value: 30
 ```
 
+## Supported Databases
+The following databases are supported:
+- Snowflake
+- Postgres
+- DuckDB
+
 ## Test types
 dbt-testgen can generate these types of tests:
 - [uniqueness](#uniqueness)
