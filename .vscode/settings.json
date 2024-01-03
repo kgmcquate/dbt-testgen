@@ -1,0 +1,14 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "lake-freeze-db.cu0bcthnum69.us-east-1.rds.amazonaws.com",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "weather",
+            "database": "postgres",
+            "username": "postgres",
+            "password": "8bF6G!Wy"
+        }
+    ]
+}
