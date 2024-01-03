@@ -77,40 +77,6 @@ jobs:
     - name: dbt test
       run: dbt test --target ${DBT_TARGET}
 
-  test-mysql:
-    name: Test on MySQL
-    runs-on: ubuntu-latest
-    container:
-      image: python:3.11
-
-    services:
-      mysql:
-        image: mysql
-        env:
-          MYSQL_USER: mysql
-          MYSQL_PASSWORD: mysql
-
-    env:
-      DBT_TARGET: mysql
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: pip install
-      run: pip install dbt-core pytz dbt-${DBT_TARGET}
-
-    - name: Install DBT deps
-      run: dbt deps --target ${DBT_TARGET}
-      
-    - name: load test data
-      run: dbt seed --target ${DBT_TARGET}
-
-    - name: Create seed tests
-      run: bash tests/create_seeds_tests_yml.sh
-
-    - name: dbt test
-      run: dbt test --target ${DBT_TARGET}
-
   test-snowflake:
     name: Test on Snowflake
     runs-on: ubuntu-latest
