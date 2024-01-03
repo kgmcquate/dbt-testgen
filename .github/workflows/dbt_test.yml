@@ -112,7 +112,7 @@ jobs:
       image: python:3.11
 
     env:
-      SNOWFLAKE_PASSWORD: ${{ secrets.REDSHIFT_PASSWORD }}
+      REDSHIFT_PASSWORD: ${{ secrets.REDSHIFT_PASSWORD }}
       DBT_TARGET: redshift
 
     steps:
