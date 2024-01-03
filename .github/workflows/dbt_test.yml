@@ -104,3 +104,31 @@ jobs:
 
     - name: dbt test
       run: dbt test --target ${DBT_TARGET}
+
+  test-redshift:
+    name: Test on RedShift
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.11
+
+    env:
+      SNOWFLAKE_PASSWORD: ${{ secrets.REDSHIFT_PASSWORD }}
+      DBT_TARGET: redshift
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: pip install
+      run: pip install dbt-core dbt-${DBT_TARGET}
+
+    - name: Install DBT deps
+      run: dbt deps --target ${DBT_TARGET}
+      
+    - name: load test data
+      run: dbt seed --target ${DBT_TARGET}
+
+    - name: Create seed tests
+      run: bash tests/create_seeds_tests_yml.sh
+
+    - name: dbt test
+      run: dbt test --target ${DBT_TARGET}
