@@ -79,14 +79,28 @@
                 testgen.array_agg(column.column) ~ " AS UNIQUE_VALUES
             from (
                 select " ~ adapter.quote(column.column) ~ "
-                from " ~ table_relation ~ "
+                from base
                 group by " ~ adapter.quote(column.column) ~ "
             ) t1
             "
         ) %}
     {% endfor %}
 
+    {% if limit != None %}
+        {% if sample == true %}
+            {% set limit_stmt = "ORDER BY " ~ testgen.get_random_function() ~ "() LIMIT " ~ limit %}
+        {% else %}
+            {% set limit_stmt = "LIMIT " ~ limit %}
+        {% endif %}
+    {% else %}
+        {% set limit_stmt = "" %}
+    {% endif %}
+
     {% set count_distinct_sql %}
+        WITH base AS (
+            SELECT * FROM {{ table_relation }}
+            {{ limit_stmt }}
+        )
         SELECT * FROM (
             {{ count_distinct_exprs | join("\nUNION ALL\n") }}
         ) t2

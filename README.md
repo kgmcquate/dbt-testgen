@@ -3,7 +3,9 @@
 ## About
 `dbt-testgen` is a [dbt](https://github.com/dbt-labs/dbt) package that autogenerates dbt test YAML based on real data.
 
-Inspired by [dbt-codegen](https://github.com/dbt-labs/dbt-codegen) and [deequ Constraint Suggestion](https://github.com/awslabs/deequ/blob/master/src/main/scala/com/amazon/deequ/examples/constraint_suggestion_example.md)
+Code documentation available at [here](https://kgmcquate.github.io/dbt-testgen/)
+
+Inspired by [dbt-codegen](https://github.com/dbt-labs/dbt-codegen) and [deequ Constraint Suggestion](https://github.com/awslabs/deequ/blob/master/src/main/scala/com/amazon/deequ/examples/constraint_suggestion_example.md).
 
 ## Install
 `dbt-testgen` currently supports `dbt 1.2.x` or higher.

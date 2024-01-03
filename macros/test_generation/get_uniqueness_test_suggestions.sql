@@ -76,6 +76,16 @@
         {% set limit_expr = "" %}
     {% endif %}
 
+    {% if limit != None %}
+        {% if sample == true %}
+            {% set limit_stmt = "ORDER BY " ~ testgen.get_random_function() ~ "() LIMIT " ~ limit %}
+        {% else %}
+            {% set limit_stmt = "LIMIT " ~ limit %}
+        {% endif %}
+    {% else %}
+        {% set limit_stmt = "" %}
+    {% endif %}
+
     {% set count_distinct_exprs = [] %}
     {% for column_combo in column_combinations %}
         {% set column_combo_quoted = [] %}
@@ -85,19 +95,27 @@
         {% do count_distinct_exprs.append(
             "SELECT " ~ loop.index ~ " AS ORDERING, count(1) AS CARDINALITY
             from (
-                SELECT 1 FROM " ~ table_relation ~ " 
+                SELECT 1 FROM base
                 GROUP BY " ~ column_combo_quoted|join(", ") ~ "
             ) t"
         ) %}
     {% endfor %}
 
     {% set count_distinct_sql %}
+    WITH base AS (
+            SELECT * FROM {{ table_relation }}
+            {{ limit_stmt }}
+        )
     {{ count_distinct_exprs | join("\nUNION ALL\n") }}
     ORDER BY ordering ASC
     {% endset %}
 
     {% set count_sql %}
-        {{ "SELECT count(1) AS TABLE_COUNT FROM " ~ table_relation }} 
+        WITH base AS (
+            SELECT * FROM {{ table_relation }}
+            {{ limit_stmt }}
+        )
+        SELECT count(1) AS TABLE_COUNT FROM base
     {% endset%}
 
     {% set table_count = testgen.query_as_list(count_sql)[0][0] %}

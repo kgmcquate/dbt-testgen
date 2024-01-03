@@ -1,0 +1,52 @@
+version: 2
+
+macros:
+  - name: get_test_suggestions
+    description: Generates YAML schema file that includes tests for your data
+    arguments:
+      - name: column_name
+        type: string
+        description: The name of the column you want to convert
+      - name: precision
+        type: integer
+        description: Number of decimal places. Defaults to 2.
+
+      - name: table_relation
+        type: Relation
+        description: |
+            The [dbt Relation](https://docs.getdbt.com/reference/dbt-classes#relation) 
+            you wish to generate tests for.
+            Example: ref("mymodel")
+      - name: sample
+        type: bool
+        description: Take a random sample when using the `limit` argument
+      - name: limit
+        type: integer
+        description: Use only this number of records to generate tests.
+      - name: resource_type
+        type: string
+        description: The type of resource that `table_relation` is - 'models', 'seeds', or 'sources'
+      - name: column_config
+        type: dict
+        description: "Configurations to set on columns. Example - {'quote': true}"
+      - name: exclude_types
+        type: list
+        description: Column types to exclude from tests.
+      - name: exclude_cols
+        type: list
+        description: Columns to exclude from tests.
+      - name: tags
+        type: list
+        description: Tags to put on the tests.
+      - name: tests
+        type: list
+        description: "Types of tests to generate. Example: ['uniqueness', 'accepted_values', 'range']"
+      - name: composite_key_length
+        type: integer
+        description: Max length of the composite key for uniqueness tests.
+      - name: dbt_config
+        type: dict
+        description: Existing parsed DBT Schema file to add tests onto.
+      - name: return_object
+        type: bool
+        description: Return the DBT Schema file as a dict object instead of printing YAML.
