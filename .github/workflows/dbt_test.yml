@@ -145,7 +145,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - run: echo "${{ secrets.GCP_KEYFILE }}" > gcp_keyfile.json
+    - run: echo '${{ secrets.GCP_KEYFILE }}' > gcp_keyfile.json
 
     - name: pip install
       run: pip install dbt-core dbt-${DBT_TARGET}
