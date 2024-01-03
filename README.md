@@ -26,6 +26,7 @@ models:
 ## Supported Databases
 The following databases are supported:
 - Snowflake
+- RedShift
 - Postgres
 - DuckDB
 
