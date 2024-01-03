@@ -140,13 +140,12 @@ jobs:
       image: python:3.11
 
     env:
-      GCP_KEYFILE: "${{ secrets.GCP_KEYFILE }}"
       DBT_TARGET: bigquery
 
     steps:
     - uses: actions/checkout@v4
 
-    - run: echo "${GCP_KEYFILE}" > gcp_keyfile.json
+    - run: echo "${{ secrets.GCP_KEYFILE }}" > gcp_keyfile.json
 
     - name: pip install
       run: pip install dbt-core dbt-${DBT_TARGET}
