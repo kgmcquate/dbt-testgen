@@ -117,7 +117,7 @@
 
     {% set new_dbt_config = {resource_type: [{"name": table_relation.identifier, "columns": column_tests}]} %}
 
-    {{ print(new_dbt_config) }}
+    {# {{ print(new_dbt_config) }} #}
 
     {% set merged_dbt_config = testgen.merge_dbt_configs(dbt_config, new_dbt_config) %}
 

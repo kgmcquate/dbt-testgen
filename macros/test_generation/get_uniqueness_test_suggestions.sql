@@ -97,16 +97,20 @@
     {% endset %}
 
     {% set count_sql %}
-        {{ "SELECT count(1) AS table_count FROM " ~ table_relation }} 
+        {{ "SELECT count(1) AS TABLE_COUNT FROM " ~ table_relation }} 
     {% endset%}
 
-    {% set table_count = testgen.query_as_list(count_sql)[0].table_count %}
+    {% set table_count = testgen.query_as_list(count_sql)[0].TABLE_COUNT %}
 
     {% set cardinality_results = zip(column_combinations, testgen.query_as_list(count_distinct_sql)) %}
+
+    {# {{ print(table_count) }}
+    {{ print(cardinality_results|list) }} #}
 
     {% set unique_keys = [] %}
     {% for cardinality_result in cardinality_results %}
         {% if cardinality_result[1].CARDINALITY == table_count %}
+            {# {{ print(cardinality_result) }} #}
             {% do unique_keys.append(cardinality_result[0]) %}
         {% endif %}
     {% endfor %}
