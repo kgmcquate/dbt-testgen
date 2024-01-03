@@ -83,7 +83,7 @@
             {% do column_combo_quoted.append(adapter.quote(col))%}
         {% endfor %}
         {% do count_distinct_exprs.append(
-            "SELECT " ~ loop.index ~ " AS ordering, count(1) AS cardinality 
+            "SELECT " ~ loop.index ~ " AS ORDERING, count(1) AS CARDINALITY
             from (
                 SELECT 1 FROM " ~ table_relation ~ " 
                 GROUP BY " ~ column_combo_quoted|join(", ") ~ "
@@ -97,16 +97,20 @@
     {% endset %}
 
     {% set count_sql %}
-        {{ "SELECT count(1) AS table_count FROM " ~ table_relation }} 
+        {{ "SELECT count(1) AS TABLE_COUNT FROM " ~ table_relation }} 
     {% endset%}
 
-    {% set table_count = testgen.query_as_list(count_sql)[0].table_count %}
+    {% set table_count = testgen.query_as_list(count_sql)[0][0] %}
 
     {% set cardinality_results = zip(column_combinations, testgen.query_as_list(count_distinct_sql)) %}
 
+    {# {{ print(table_count) }}
+    {{ print(cardinality_results|list) }} #}
+
     {% set unique_keys = [] %}
     {% for cardinality_result in cardinality_results %}
-        {% if cardinality_result[1].cardinality == table_count %}
+        {% if cardinality_result[1][1] == table_count %}
+            {# {{ print(cardinality_result) }} #}
             {% do unique_keys.append(cardinality_result[0]) %}
         {% endif %}
     {% endfor %}

@@ -19,6 +19,9 @@ jobs:
       matrix:
         python-version: ["3.9", "3.10", "3.11"]
 
+    env:
+      DBT_TARGET: duckdb
+
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -27,19 +30,19 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: pip install
-      run: pip install dbt-core duckdb dbt-duckdb
+      run: pip install dbt-core duckdb dbt-${DBT_TARGET}
 
     - name: Install DBT deps
-      run: dbt deps --target duckdb
+      run: dbt deps --target ${DBT_TARGET}
       
     - name: load test data
-      run: dbt seed --target duckdb
+      run: dbt seed --target ${DBT_TARGET}
 
     - name: Create seed tests
       run: bash tests/create_seeds_tests_yml.sh
 
     - name: dbt test
-      run: dbt test --target duckdb
+      run: dbt test --target ${DBT_TARGET}
 
   test-postgres:
     name: Test on Postgres
@@ -53,21 +56,79 @@ jobs:
         env:
           POSTGRES_PASSWORD: postgres
 
+    env:
+      DBT_TARGET: postgres
+
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
 
     - name: pip install
-      run: pip install dbt-core duckdb dbt-postgres
+      run: pip install dbt-core dbt-${DBT_TARGET}
 
     - name: Install DBT deps
-      run: dbt deps --target postgres
+      run: dbt deps --target ${DBT_TARGET}
       
     - name: load test data
-      run: dbt seed --target postgres
+      run: dbt seed --target ${DBT_TARGET}
+
+    - name: Create seed tests
+      run: bash tests/create_seeds_tests_yml.sh
 
     - name: dbt test
-      run: dbt test --target postgres
+      run: dbt test --target ${DBT_TARGET}
+
+  test-snowflake:
+    name: Test on Snowflake
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.11
+
+    env:
+      SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      DBT_TARGET: snowflake
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: pip install
+      run: pip install dbt-core dbt-${DBT_TARGET}
+
+    - name: Install DBT deps
+      run: dbt deps --target ${DBT_TARGET}
+      
+    - name: load test data
+      run: dbt seed --target ${DBT_TARGET}
+
+    - name: Create seed tests
+      run: bash tests/create_seeds_tests_yml.sh
+
+    - name: dbt test
+      run: dbt test --target ${DBT_TARGET}
+
+  test-redshift:
+    name: Test on RedShift
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.11
+
+    env:
+      REDSHIFT_PASSWORD: ${{ secrets.REDSHIFT_PASSWORD }}
+      DBT_TARGET: redshift
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: pip install
+      run: pip install dbt-core dbt-${DBT_TARGET}
+
+    - name: Install DBT deps
+      run: dbt deps --target ${DBT_TARGET}
+      
+    - name: load test data
+      run: dbt seed --target ${DBT_TARGET}
+
+    - name: Create seed tests
+      run: bash tests/create_seeds_tests_yml.sh
+
+    - name: dbt test
+      run: dbt test --target ${DBT_TARGET}
