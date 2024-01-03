@@ -83,7 +83,7 @@
             {% do column_combo_quoted.append(adapter.quote(col))%}
         {% endfor %}
         {% do count_distinct_exprs.append(
-            "SELECT " ~ loop.index ~ " AS ordering, count(1) AS cardinality 
+            "SELECT " ~ loop.index ~ " AS ORDERING, count(1) AS CARDINALITY
             from (
                 SELECT 1 FROM " ~ table_relation ~ " 
                 GROUP BY " ~ column_combo_quoted|join(", ") ~ "
@@ -106,7 +106,7 @@
 
     {% set unique_keys = [] %}
     {% for cardinality_result in cardinality_results %}
-        {% if cardinality_result[1].cardinality == table_count %}
+        {% if cardinality_result[1].CARDINALITY == table_count %}
             {% do unique_keys.append(cardinality_result[0]) %}
         {% endif %}
     {% endfor %}
