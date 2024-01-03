@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
 
     env:
       DBT_TARGET: duckdb
@@ -34,7 +34,7 @@ jobs:
 
     - name: Install DBT deps
       run: dbt deps --target ${DBT_TARGET}
-      
+
     - name: load test data
       run: dbt seed --target ${DBT_TARGET}
 
@@ -67,7 +67,7 @@ jobs:
 
     - name: Install DBT deps
       run: dbt deps --target ${DBT_TARGET}
-      
+
     - name: load test data
       run: dbt seed --target ${DBT_TARGET}
 
@@ -95,7 +95,7 @@ jobs:
 
     - name: Install DBT deps
       run: dbt deps --target ${DBT_TARGET}
-      
+
     - name: load test data
       run: dbt seed --target ${DBT_TARGET}
 
@@ -123,7 +123,7 @@ jobs:
 
     - name: Install DBT deps
       run: dbt deps --target ${DBT_TARGET}
-      
+
     - name: load test data
       run: dbt seed --target ${DBT_TARGET}
 
@@ -132,3 +132,46 @@ jobs:
 
     - name: dbt test
       run: dbt test --target ${DBT_TARGET}
+
+  test-bigquery:
+    name: Test on BigQuery
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.11
+
+    env:
+      DBT_TARGET: bigquery
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: create-json
+      id: create-json
+      uses: jsdaniell/create-json@1.1.2
+      with:
+        name: "gcp_keyfile.json"
+        dir: 'integration_tests/'
+        json: ${{ secrets.GCP_KEYFILE }}
+
+    #- run: echo '${{ secrets.GCP_KEYFILE }}' > gcp_keyfile.json
+
+    - name: pip install
+      run: pip install dbt-core dbt-${DBT_TARGET}
+
+    - name: Install DBT deps
+      run: dbt deps --target ${DBT_TARGET}
+      
+    - name: load test data
+      run: dbt seed --target ${DBT_TARGET} -s users
+
+    - name: Create seed tests
+      run: |
+        dbt compile --target ${DBT_TARGET} -q \
+        --inline "{{ testgen.get_test_suggestions(ref('users'), resource_type='seeds', column_config={'quote': true, 'tags': ['dataset-users']} ) }}" \
+        > seeds/users_test_suggestions.yml
+
+    - name: dbt test
+      run: dbt test --target ${DBT_TARGET} -s tag:dataset-users
+
+      
+  

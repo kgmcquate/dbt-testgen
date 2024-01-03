@@ -54,3 +54,10 @@ integration_tests:
       dbname: dbt_testgen
       schema: dbt_testgen
       port: 5439
+    bigquery:
+      type: bigquery
+      method: service-account
+      project: dbt-testgen
+      dataset: dbt_testgen
+      threads: 1
+      keyfile: gcp_keyfile.json

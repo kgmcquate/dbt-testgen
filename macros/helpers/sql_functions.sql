@@ -6,3 +6,7 @@
 {% macro default__get_random_function(colname) %}
     {{ return("RANDOM") }}
 {% endmacro %}
+
+{% macro bigquery__get_random_function(colname) %}
+    {{ return("RAND") }}
+{% endmacro %}
