@@ -50,7 +50,8 @@
         {% do min_max_exprs.append(
             "SELECT '" ~ column.column ~ "' AS COLNAME, " ~ 
                 "MIN(" ~ adapter.quote(column.column) ~ ") as COL_MIN, " ~ 
-                "MAX(" ~ adapter.quote(column.column) ~ ") as COL_MAX " ~ 
+                "MAX(" ~ adapter.quote(column.column) ~ ") as COL_MAX, " ~ 
+                loop.index ~ " AS ORDERING " ~ 
             "FROM " ~ table_relation
         ) %}
     {% endfor %}
@@ -60,6 +61,7 @@
         SELECT * FROM (
             {{ min_max_exprs | join("\nUNION ALL\n") }}
         ) t1
+        ORDER BY ORDERING ASC
     {% endset %}
 
     {% set results = testgen.query_as_list(min_max_sql) %}

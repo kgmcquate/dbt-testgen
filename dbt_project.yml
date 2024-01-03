@@ -1,8 +1,6 @@
 name: 'testgen'
-version: '0.0.1'
 
-profile: postgres
-
+require-dbt-version: [">=1.2.0", "<2.0.0"]
 config-version: 2
 
 target-path: "target"
