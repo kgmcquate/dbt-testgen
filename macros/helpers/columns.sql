@@ -1,4 +1,4 @@
- {% macro exclude_column_types(columns, exclude_types) %}
+{% macro exclude_column_types(columns, exclude_types) %}
     {% set filtered_columns = [] %}
     {% for col in columns %}
         {% if col.is_string() and "string" not in exclude_types %}

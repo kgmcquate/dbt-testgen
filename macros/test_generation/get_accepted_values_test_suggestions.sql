@@ -6,6 +6,11 @@
     {{ return("array_agg(" ~ adapter.quote(colname) ~ "::VARCHAR)") }}
 {% endmacro %}
 
+{% macro redshift__array_agg(colname) %}
+    {{ return("split_to_array(listagg(" ~ adapter.quote(colname) ~ "::VARCHAR, '|'), '|') ") }}
+{% endmacro %}
+
+
 
 {% macro get_accepted_values_test_suggestions(
         table_relation,

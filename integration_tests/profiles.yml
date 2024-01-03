@@ -43,7 +43,7 @@ integration_tests:
       type: redshift
       host: dbt-testgen.117819748843.us-east-1.redshift-serverless.amazonaws.com
       user: dbt_testgen
-      password: "{{ env_var('REDSHIFT_PASSWORD') }}"
+      password: mw*gXe9JMvp!0v%E #"{{ env_var('REDSHIFT_PASSWORD') }}"
       dbname: dbt_testgen
       schema: dbt_testgen
       port: 5439
