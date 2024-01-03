@@ -3,6 +3,7 @@ dbt_packages/
 logs/
 dbt-env/
 integration_tests/seeds/*.yml
+*gcp_keyfile.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
