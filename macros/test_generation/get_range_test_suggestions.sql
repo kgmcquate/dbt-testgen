@@ -91,8 +91,8 @@
                 "tests": [
                     {
                         "dbt_utils.accepted_range": {
-                            "min_value": result[1]|string|float,
-                            "max_value": result[2]|string|float
+                            "min_value": testgen.cast_number(result[1]),
+                            "max_value": testgen.cast_number(result[2])
                         }
                     }
                 ]
@@ -105,8 +105,6 @@
 
         {% do column_tests.append(col_config) %}
     {% endfor %}
-
-    
 
     {% set model = {"name": table_relation.identifier,  "columns": column_tests} %}
 

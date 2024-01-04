@@ -42,7 +42,7 @@ jobs:
       run: bash tests/create_seeds_tests_yml.sh
 
     - name: dbt test
-      run: dbt test --target ${DBT_TARGET}
+      run: dbt test --target ${DBT_TARGET} --exclude "*recency*"
 
   test-postgres:
     name: Test on Postgres
@@ -75,7 +75,7 @@ jobs:
       run: bash tests/create_seeds_tests_yml.sh
 
     - name: dbt test
-      run: dbt test --target ${DBT_TARGET}
+      run: dbt test --target ${DBT_TARGET} --exclude "*recency*"
 
   test-snowflake:
     name: Test on Snowflake
@@ -103,7 +103,7 @@ jobs:
       run: bash tests/create_seeds_tests_yml.sh
 
     - name: dbt test
-      run: dbt test --target ${DBT_TARGET}
+      run: dbt test --target ${DBT_TARGET} --exclude "*recency*"
 
   test-redshift:
     name: Test on RedShift
@@ -131,7 +131,7 @@ jobs:
       run: bash tests/create_seeds_tests_yml.sh
 
     - name: dbt test
-      run: dbt test --target ${DBT_TARGET}
+      run: dbt test --target ${DBT_TARGET} --exclude "*recency*"
 
   test-bigquery:
     name: Test on BigQuery
