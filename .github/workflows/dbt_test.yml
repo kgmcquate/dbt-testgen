@@ -174,10 +174,10 @@ jobs:
       run: dbt deps --target ${DBT_TARGET}
       
     - name: load test data
-      run: dbt seed --target ${DBT_TARGET} -s users
+      run: dbt seed --target ${DBT_TARGET} --exclude colnames_with_spaces
 
     - name: dbt test macros
-      run: dbt test --target ${DBT_TARGET}
+      run: dbt test --target ${DBT_TARGET} --exclude tag:dataset-colnames_with_spaces
 
     - name: Create seed tests
       run: |
@@ -186,6 +186,6 @@ jobs:
         > seeds/users_test_suggestions.yml
 
     - name: dbt test seeds
-      run: dbt test --target ${DBT_TARGET} --select config.materialized:seed --exclude "dbt_utils_recency*"
+      run: dbt test --target ${DBT_TARGET} --select config.materialized:seed --exclude "dbt_utils_recency*" --exclude tag:dataset-colnames_with_spaces
       
   
