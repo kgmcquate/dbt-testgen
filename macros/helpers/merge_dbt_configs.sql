@@ -45,6 +45,24 @@
 
             {% set new_models = [] %}
             {% for model_name in model_names %}
+                {% set model_tests = [] %}
+                {% if "tests" in config_1_model_lookup[model_name].keys() %}
+                    {% for model_test in config_1_model_lookup[model_name]["tests"] %}
+                        {% do model_tests.append(model_test) %}
+                    {% endfor %}
+                {% endif %}
+                {% if "tests" in config_2_model_lookup[model_name].keys() %}
+                    {% for model_test in config_2_model_lookup[model_name]["tests"] %}
+                        {% do model_tests.append(model_test) %}
+                    {% endfor %}
+                {% endif %}
+
+                {% set model = {"name": model_name} %}
+
+                {% if model_tests != [] %}
+                    {% do model.update({"tests": model_tests})%}
+                {% endif %}
+
                 {% set col_names = [] %}
 
                 {% set config_1_col_lookup = {} %}
@@ -89,22 +107,7 @@
                     {% do new_columns.append(new_column) %}
                 {% endfor %}
 
-                {% set model_tests = [] %}
-                {% if "tests" in config_1_model_lookup[model_name].keys() %}
-                    {% for model_test in config_1_model_lookup[model_name]["tests"] %}
-                        {% do model_tests.append(model_test) %}
-                    {% endfor %}
-                {% endif %}
-                {% if "tests" in config_2_model_lookup[model_name].keys() %}
-                    {% for model_test in config_2_model_lookup[model_name]["tests"] %}
-                        {% do model_tests.append(model_test) %}
-                    {% endfor %}
-                {% endif %}
-
-                {% set model = {"name": model_name, "columns": new_columns} %}
-                {% if model_tests != [] %}
-                    {% do model.update({"tests": model_tests})%}
-                {% endif %}
+                {% do model.update({"columns": new_columns})%}
                 
                 {% do new_models.append(model)%}
             {% endfor %}

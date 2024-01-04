@@ -63,6 +63,10 @@
         {% endif %}
     {% endfor %}
 
+    {% if column_names|length == 0 %}
+        {{ return(dbt_config) }}
+    {% endif %}
+
     {% set column_combinations = [] %}
     {% for i in range(composite_key_length) %}
         {% for col_combo in modules.itertools.combinations(column_names, i + 1)%}

@@ -71,6 +71,10 @@
     {% set columns = testgen.exclude_column_types(columns, exclude_types) %}
     {% set columns = testgen.exclude_column_names(columns, exclude_cols) %}
 
+    {% if columns|length == 0 %}
+        {{ return(dbt_config) }}
+    {% endif %}
+
     {% set count_distinct_exprs = [] %}
     {% for column in columns %}
         {# Use capitals for colnames because of snowflake #}
