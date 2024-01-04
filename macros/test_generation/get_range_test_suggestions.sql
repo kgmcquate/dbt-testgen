@@ -45,6 +45,10 @@
         {% endif %}
     {% endfor %}
 
+    {% if number_cols|length == 0 %}
+        {{ return(dbt_config) }}
+    {% endif %}
+
     {% if limit != None %}
         {% if sample == true %}
             {% set limit_stmt = "ORDER BY " ~ testgen.get_random_function() ~ "() LIMIT " ~ limit %}
@@ -87,8 +91,8 @@
                 "tests": [
                     {
                         "dbt_utils.accepted_range": {
-                            "min_value": result[1],
-                            "max_value": result[2]
+                            "min_value": result[1]|string|float,
+                            "max_value": result[2]|string|float
                         }
                     }
                 ]

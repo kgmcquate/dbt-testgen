@@ -45,6 +45,10 @@
         {% endif %}
     {% endfor %}
 
+    {% if string_cols|length == 0 %}
+        {{ return(dbt_config) }}
+    {% endif %}
+
     {% if limit != None %}
         {% if sample == true %}
             {% set limit_stmt = "ORDER BY " ~ testgen.get_random_function() ~ "() LIMIT " ~ limit %}
