@@ -33,6 +33,11 @@ Output:
 ```yaml
 models:
 - name: mymodel
+  tests:
+  - dbt_utils.recency:
+      field: day
+      datepart: day
+      interval: 2
   columns:
   - name: user_id
     tests:
@@ -81,6 +86,5 @@ dbt-testgen can generate these types of tests:
 - [string length](#string-length)
 - [range](#range)
 - [accepted_values](#accepted-values)
-<!-- - [freshness](#freshness) -->
-<!-- - [std_dev] -->
+- [recency](#recency)
 
