@@ -178,7 +178,7 @@ jobs:
 
     - name: dbt test macros
       run: dbt test --target ${DBT_TARGET} --exclude tag:dataset-colnames_with_spaces
-
+      
     - name: Create seed tests
       run: |
         dbt compile --target ${DBT_TARGET} -q \
@@ -188,4 +188,3 @@ jobs:
     - name: dbt test seeds
       run: dbt test --target ${DBT_TARGET} --select config.materialized:seed --exclude "dbt_utils_recency*" --exclude tag:dataset-colnames_with_spaces
       
-  
