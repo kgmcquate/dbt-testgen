@@ -86,7 +86,7 @@
             {{ loop.index }} AS ordering
         FROM (
             SELECT 
-                {{ dbt.datediff("LAG(date, 1) OVER(ORDER BY " ~ adapter.quote(col.column) ~ ")", adapter.quote(col.column), "minute") }} AS minutes_diff
+                {{ dbt.datediff("LAG(" ~ adapter.quote(col.column) ~ ", 1) OVER(ORDER BY " ~ adapter.quote(col.column) ~ ")", adapter.quote(col.column), "minute") }} AS minutes_diff
             FROM  base
         ) t2
         WHERE minutes_diff <> 0 

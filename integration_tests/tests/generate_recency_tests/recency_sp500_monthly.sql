@@ -13,7 +13,7 @@ models:
 - name: sp500_monthly
   tests:
   - dbt_utils.recency:
-      field: Date
+      field: month
       datepart: day
       interval: 31
 {% endset %}

@@ -37,12 +37,15 @@ jobs:
 
     - name: load test data
       run: dbt seed --target ${DBT_TARGET}
+    
+    - name: dbt test macros
+      run: dbt test --target ${DBT_TARGET}
 
     - name: Create seed tests
       run: bash tests/create_seeds_tests_yml.sh
 
-    - name: dbt test
-      run: dbt test --target ${DBT_TARGET} --exclude "*recency*"
+    - name: dbt test seeds
+      run: dbt test --target ${DBT_TARGET} --select config.materialized:seed --exclude "dbt_utils_recency*"
 
   test-postgres:
     name: Test on Postgres
@@ -71,11 +74,14 @@ jobs:
     - name: load test data
       run: dbt seed --target ${DBT_TARGET}
 
+    - name: dbt test macros
+      run: dbt test --target ${DBT_TARGET}
+
     - name: Create seed tests
       run: bash tests/create_seeds_tests_yml.sh
 
-    - name: dbt test
-      run: dbt test --target ${DBT_TARGET} --exclude "*recency*"
+    - name: dbt test seeds
+      run: dbt test --target ${DBT_TARGET} --select config.materialized:seed --exclude "dbt_utils_recency*"
 
   test-snowflake:
     name: Test on Snowflake
@@ -99,11 +105,14 @@ jobs:
     - name: load test data
       run: dbt seed --target ${DBT_TARGET}
 
+    - name: dbt test macros
+      run: dbt test --target ${DBT_TARGET}
+
     - name: Create seed tests
       run: bash tests/create_seeds_tests_yml.sh
 
-    - name: dbt test
-      run: dbt test --target ${DBT_TARGET} --exclude "*recency*"
+    - name: dbt test seeds
+      run: dbt test --target ${DBT_TARGET} --select config.materialized:seed --exclude "dbt_utils_recency*"
 
   test-redshift:
     name: Test on RedShift
@@ -127,11 +136,14 @@ jobs:
     - name: load test data
       run: dbt seed --target ${DBT_TARGET}
 
+    - name: dbt test macros
+      run: dbt test --target ${DBT_TARGET}
+
     - name: Create seed tests
       run: bash tests/create_seeds_tests_yml.sh
 
-    - name: dbt test
-      run: dbt test --target ${DBT_TARGET} --exclude "*recency*"
+    - name: dbt test seeds
+      run: dbt test --target ${DBT_TARGET} --select config.materialized:seed --exclude "dbt_utils_recency*"
 
   test-bigquery:
     name: Test on BigQuery
@@ -164,14 +176,16 @@ jobs:
     - name: load test data
       run: dbt seed --target ${DBT_TARGET} -s users
 
+    - name: dbt test macros
+      run: dbt test --target ${DBT_TARGET}
+
     - name: Create seed tests
       run: |
         dbt compile --target ${DBT_TARGET} -q \
         --inline "{{ testgen.get_test_suggestions(ref('users'), resource_type='seeds', column_config={'quote': true, 'tags': ['dataset-users']} ) }}" \
         > seeds/users_test_suggestions.yml
 
-    - name: dbt test
-      run: dbt test --target ${DBT_TARGET} -s tag:dataset-users
-
+    - name: dbt test seeds
+      run: dbt test --target ${DBT_TARGET} --select config.materialized:seed --exclude "dbt_utils_recency*"
       
   

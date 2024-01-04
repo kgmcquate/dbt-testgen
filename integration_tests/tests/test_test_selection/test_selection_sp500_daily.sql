@@ -15,11 +15,11 @@ models:
 - name: sp500_daily
   tests:
   - dbt_utils.recency:
-      field: date
+      field: day
       datepart: day
       interval: 2
   columns:
-  - name: date
+  - name: day
     tests:
     - unique
     - not_null
