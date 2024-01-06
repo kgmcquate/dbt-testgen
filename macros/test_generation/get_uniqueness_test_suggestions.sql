@@ -9,14 +9,13 @@
         column_config = {},
         exclude_types = ["float"],
         exclude_cols = [],
-        tags = ["uniqueness"],
         composite_key_length = 1,
         dbt_config = None
     ) %}
     {# Run macro for the specific target DB #}
     {% if execute %}
         {{ return(
-            adapter.dispatch('get_uniqueness_test_suggestions', 'testgen')(table_relation, sample, limit, resource_type, column_config, exclude_types, exclude_cols, tags, composite_key_length, dbt_config, **kwargs)
+            adapter.dispatch('get_uniqueness_test_suggestions', 'testgen')(table_relation, sample, limit, resource_type, column_config, exclude_types, exclude_cols, composite_key_length, dbt_config, **kwargs)
         ) }}
     {% endif %}
 {% endmacro %}
@@ -30,37 +29,17 @@
         column_config = {},
         exclude_types = ["float"],
         exclude_cols = [],
-        tags = ["uniqueness"],
         composite_key_length = 1,
         dbt_config = None
     ) 
 %}
-    
-    {# kwargs is used for test configurations #}
-    {% set test_config = kwargs %}
-    {# {% if tags != None %}
-        {% do test_config.update({"tags": tags}) %}
-    {% endif %} #}
-
     {% set columns = adapter.get_columns_in_relation(table_relation) %}
+    {% set columns = testgen.exclude_column_types(columns, exclude_types) %}
+    {% set columns = testgen.exclude_column_names(columns, exclude_cols) %}
 
     {% set column_names = [] %}
     {% for col in columns %}
-        {% if col.column not in exclude_cols %}
-            {% if col.is_string() and "string" not in exclude_types %}
-                {% do column_names.append(col.column) %}
-            {% elif col.is_numeric() and "numeric" not in exclude_types %}
-                {% do column_names.append(col.column) %}
-            {% elif col.is_number() and "number" not in exclude_types %}
-                {% do column_names.append(col.column) %}
-            {% elif col.is_integer() and "integer" not in exclude_types %}
-                {% do column_names.append(col.column) %}
-            {% elif col.is_float() and "float" not in exclude_types %}
-                {% do column_names.append(col.column) %}
-            {% elif col.column not in exclude_cols %}
-                {% do column_names.append(col.column) %}
-            {% endif %}
-        {% endif %}
+        {% do column_names.append(col.column) %}
     {% endfor %}
 
     {% if column_names|length == 0 %}
@@ -73,6 +52,8 @@
             {% do column_combinations.append(col_combo) %}
         {% endfor %}
     {% endfor %}
+
+    {# {{ print(column_combinations) }} #}
 
     {% if limit %}
         {% set limit_expr = "LIMIT " ~ limit|string %}
@@ -170,14 +151,16 @@
     {% set table_tests = [] %}  
     {% for unique_key in deduped_unique_keys %}
         {% if unique_key|length == 1 %}
-            {% set tests = [
+            {# {% set tests = [
                     {"unique": test_config},
                     {"not_null": test_config}
             ] %}
 
             {% if test_config == {} %}
-                {% set tests = ["unique", "not_null"] %}
-            {% endif %}
+                
+            {% endif %} #}
+
+            {% set tests = ["unique", "not_null"] %}
 
             {% set col_config = {
                     "name": unique_key[0],
@@ -204,6 +187,8 @@
     {% if table_tests != [] %}
         {% do model.update({"tests": table_tests}) %} 
     {% endif %}
+
+    {# {{ print(model) }} #}
 
     {% set new_dbt_config = {resource_type: [model]} %}
 

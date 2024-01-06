@@ -10,3 +10,9 @@ model-paths: ["models"]
 seed-paths: ["seeds"]
 test-paths: ["tests"]
 log-path: "logs"
+
+
+models:
+  dbt_utils: # Hide "dbt_utils" package
+    +docs:
+      show: false

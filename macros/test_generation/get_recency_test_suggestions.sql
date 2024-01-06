@@ -7,7 +7,6 @@
         column_config = {},
         exclude_types = [],
         exclude_cols = [],
-        tags = ["recency"],
         stddevs = 1,
         dbt_config = None
     ) %}
@@ -21,8 +20,7 @@
                 resource_type,
                 column_config,
                 exclude_types, 
-                exclude_cols, 
-                tags,
+                exclude_cols,
                 stddevs,
                 dbt_config,
                 **kwargs)
@@ -40,17 +38,10 @@
         column_config = {},
         exclude_types = [],
         exclude_cols = [],
-        tags = ["recency"],
         stddevs = 1,
         dbt_config = None
     ) 
 %}
-    {# kwargs is used for test configurations #}
-    {# {% set test_config = kwargs %} #}
-    {# {% if tags != None %}
-        {% do test_config.update({"tags": tags}) %}
-    {% endif %} #}
-
     {% set columns = adapter.get_columns_in_relation(table_relation) %}
     {% set columns = testgen.exclude_column_types(columns, exclude_types) %}
     {% set columns = testgen.exclude_column_names(columns, exclude_cols) %}

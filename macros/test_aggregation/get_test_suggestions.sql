@@ -7,9 +7,12 @@
         column_config = {},
         exclude_types = [],
         exclude_cols = [],
-        tags = [],
         tests = ["uniqueness", "accepted_values", "range", "string_length", "recency"],
-        composite_key_length = 1,
+        uniqueness_composite_key_length = 1,
+        accepted_values_max_cardinality = 5,
+        range_stddevs = 0,
+        string_length_stddevs = 0,
+        recency_stddevs = 1,
         dbt_config = None,
         return_object = false
     ) %}
@@ -24,8 +27,7 @@
                 column_config=column_config,
                 exclude_types=exclude_types,
                 exclude_cols=exclude_cols,
-                tags=tags,
-                composite_key_length=composite_key_length,
+                composite_key_length=uniqueness_composite_key_length,
                 dbt_config=dbt_config
             ) %}
         {% endif %}
@@ -39,7 +41,7 @@
                 column_config=column_config,
                 exclude_types=exclude_types,
                 exclude_cols=exclude_cols,
-                tags=tags,
+                max_cardinality=accepted_values_max_cardinality,
                 dbt_config=dbt_config
             ) %}
         {% endif %}
@@ -53,7 +55,7 @@
                 column_config=column_config,
                 exclude_types=exclude_types,
                 exclude_cols=exclude_cols,
-                tags=tags,
+                stddevs=range_stddevs,
                 dbt_config=dbt_config
             ) %}
         {% endif %}
@@ -67,7 +69,7 @@
                 column_config=column_config,
                 exclude_types=exclude_types,
                 exclude_cols=exclude_cols,
-                tags=tags,
+                stddevs=string_length_stddevs,
                 dbt_config=dbt_config
             ) %}
         {% endif %}
@@ -81,7 +83,7 @@
                 column_config=column_config,
                 exclude_types=exclude_types,
                 exclude_cols=exclude_cols,
-                tags=tags,
+                stddevs=recency_stddevs,
                 dbt_config=dbt_config
             ) %}
         {% endif %}

@@ -1,16 +1,11 @@
 version: 2
 
+
+
 macros:
   - name: get_test_suggestions
     description: Generates YAML schema file that includes tests for your data
-    arguments:
-      - name: column_name
-        type: string
-        description: The name of the column you want to convert
-      - name: precision
-        type: integer
-        description: Number of decimal places. Defaults to 2.
-
+    arguments: 
       - name: table_relation
         type: Relation
         description: |
@@ -40,13 +35,25 @@ macros:
         description: Tags to put on the tests.
       - name: tests
         type: list
-        description: "Types of tests to generate. Example: ['uniqueness', 'accepted_values', 'range']"
-      - name: composite_key_length
+        description: "Types of tests to generate. Example: ['uniqueness', 'accepted_values', 'range', 'string_length', 'recency']"
+      - name: uniqueness_composite_key_length
+        description: Max length of the composite key for uniqueness tests. Default value is 1.
         type: integer
-        description: Max length of the composite key for uniqueness tests.
+      - name: accepted_values_max_cardinality
+        description: Max cardinality of column to include in generated tests. Default value is 5.
+        type: integer
+      - name: range_stddevs
+        description: Number of standard deviations to add to the range in the generated range tests. Default value is 0.
+        type: integer
+      - name: string_length_stddevs
+        description: Number of standard deviations to add to the string length range in the generated string_length tests. Default value is 0.
+        type: integer
+      - name: recency_stddevs
+        description: Number of standard deviations to add to the recency interval in the generated recency tests. Default value is 1.
+        type: integer
       - name: dbt_config
+        description: Existing dbt_config dict to merge generated tests into.
         type: dict
-        description: Existing parsed DBT Schema file to add tests onto.
       - name: return_object
         type: bool
         description: Return the DBT Schema file as a dict object instead of printing YAML.
