@@ -2,7 +2,7 @@
 :root {
     --main-bg-color: rgb(199, 199, 199);
     --main-color: rgb(85, 85, 85);
-  }
+}
 
 search {
     background-color: var(--main-bg-color) !important ;
