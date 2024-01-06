@@ -27,13 +27,13 @@ The following databases are supported:
 Integration tests are run for each of these databases in [Actions](https://github.com/kgmcquate/dbt-testgen/actions).
 
 # Test types
-dbt-testgen can generate these types of tests:
-- [uniqueness](#uniqueness)
-- [not_null](#not-null)
-- [string length](#string-length)
-- [range](#range)
-- [accepted_values](#accepted-values)
-- [recency](#recency)
+dbt-testgen can generate these types of tests, using [built-in tests](https://docs.getdbt.com/reference/resource-properties/data-tests), [dbt_utils](https://github.com/dbt-labs/dbt-utils), and [dbt-expectations](https://github.com/calogica/dbt-expectations/):
+- [uniqueness](https://github.com/dbt-labs/dbt-utils?tab=readme-ov-file#unique_combination_of_columns-source)
+- [not_null](https://docs.getdbt.com/reference/resource-properties/data-tests#not_null)
+- [string length](https://github.com/calogica/dbt-expectations/tree/main?tab=readme-ov-file#expect_column_value_lengths_to_be_between)
+- [range](https://github.com/dbt-labs/dbt-utils?tab=readme-ov-file#accepted_range-source)
+- [accepted_values](https://docs.getdbt.com/reference/resource-properties/data-tests#accepted_values)
+- [recency](https://github.com/dbt-labs/dbt-utils?tab=readme-ov-file#recency-source)
 
 
 # Macros
@@ -99,9 +99,51 @@ models:
 ```
 
 <hr>
+<br>
+
+You can output to a file like this:
+```yaml
+dbt compile -q --inline "{{ testgen.get_test_suggestions(ref('mymodel')) }}" >> models/schema.yml
+```
+
+<hr>
+<br>
+
+You can also merge with an existing properties YAML file:
+```bash
+EXISTING_YAML_BODY=`cat models/schema.yml`
+dbt compile -q --inline "{{ testgen.get_test_suggestions(ref('users'), dbt_config=fromyaml(\"${EXISTING_YAML_BODY}\")) }}"
+```
+
+<hr>
+<br>
 
 Here's an example of more advanced usage:
 ```bash
+EXISTING_YAML_BODY=$(cat <<EOF
+models:
+- name: stg_jaffle_shop__customers
+  config:
+    tags:
+    - pii
+  columns:
+  - name: customer_id
+    tests:
+    - unique
+    - not_null
+
+seeds:
+- name: stg_jaffle_shop__orders
+  config:
+    materialized: view
+  columns:
+  - name: order_id
+    tests:
+    - unique
+    - not_null
+EOF
+)
+
 JINJA_TEMPLATE=$(cat <<EOF
 {{ testgen.get_test_suggestions(
     ref('users'),
@@ -113,15 +155,33 @@ JINJA_TEMPLATE=$(cat <<EOF
     tests = ['uniqueness', 'accepted_values', 'range'],
     uniqueness_composite_key_length = 2,
     accepted_values_max_cardinality = 10,
-    range_stddevs = 1
+    range_stddevs = 1,
+    dbt_config=fromyaml("${EXISTING_YAML_BODY}")
 ) }}
 EOF
 )
+
 dbt compile -q --inline "${JINJA_TEMPLATE}"
 ```
 Output:
 ```yaml
+models:
+- name: stg_jaffle_shop__customers
+  config:
+    tags:
+    - pii
+  columns:
+  - name: customer_id
+    tests:
+    - unique
+    - not_null
 seeds:
+- name: stg_jaffle_shop__orders
+  columns:
+  - name: order_id
+    tests:
+    - unique
+    - not_null
 - name: users
   columns:
   - name: user_id
@@ -129,7 +189,7 @@ seeds:
     - unique
     - not_null
     - dbt_utils.accepted_range:
-        min_value: -3.4017042154147514
+        min_value: -3.4017042154147523
         max_value: 34.40170421541475
     quote: true
     tags:
