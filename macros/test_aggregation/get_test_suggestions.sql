@@ -2,7 +2,7 @@
 {% macro get_test_suggestions(
         table_relation,
         sample = false,
-        limit = None,
+        limit = 10000,
         resource_type = "models",
         column_config = {},
         exclude_types = [],

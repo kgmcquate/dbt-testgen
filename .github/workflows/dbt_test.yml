@@ -3,6 +3,8 @@ name: Test DBT package
 on:
   push:
     branches: [ "main", "develop" ]
+    paths-ignore:
+      - 'integration_tests/docs/**'
 
 permissions:
   contents: read
