@@ -200,6 +200,8 @@ jobs:
 
     env:
       DBT_TARGET: databricks
+      DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+      DATABRICKS_SECRET_ID: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
 
     steps:
     - uses: actions/checkout@v4
