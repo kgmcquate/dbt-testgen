@@ -3,6 +3,9 @@ name: Test DBT package
 on:
   push:
     branches: [ "main", "develop" ]
+    paths:
+      - macros/
+      - dbt_project.yml
     paths-ignore:
       - 'integration_tests/docs/**'
 

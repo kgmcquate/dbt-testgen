@@ -192,6 +192,8 @@
 
     {% set new_dbt_config = {resource_type: [model]} %}
 
+    {# {{ print(dbt_config) }} #}
+
     {% set merged_dbt_config = testgen.merge_dbt_configs(dbt_config, new_dbt_config) %}
 
     {% do return(merged_dbt_config) %}
