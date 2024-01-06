@@ -29,6 +29,7 @@ packages:
 # Supported Databases
 The following databases are supported:
 - Snowflake
+- Databricks
 - RedShift
 - BigQuery
 - Postgres
