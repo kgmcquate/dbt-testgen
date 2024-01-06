@@ -6,8 +6,7 @@ on:
     paths:
       - macros/
       - dbt_project.yml
-    paths-ignore:
-      - 'integration_tests/docs/**'
+      - .github/workflows/dbt_test.yml
 
 permissions:
   contents: read
