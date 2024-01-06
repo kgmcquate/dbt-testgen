@@ -59,5 +59,16 @@ integration_tests:
       method: service-account
       project: dbt-testgen
       dataset: dbt_testgen
-      threads: 1
+      threads: 4
       keyfile: gcp_keyfile.json
+
+    databricks:
+      type: databricks
+      #catalog: [optional catalog name if you are using Unity Catalog]
+      schema: hive_metastore # Required
+      host: dbc-ce3894e5-7741.cloud.databricks.com # Required
+      http_path: /sql/1.0/warehouses/f16c9d04325bef22 # Required
+      auth_type: oauth
+      client_id: "{{ env_var('DATABRICKS_CLIENT_ID') }}"
+      client_secret: "{{ env_var('DATABRICKS_CLIENT_SECRET') }}"
+      threads: 4
