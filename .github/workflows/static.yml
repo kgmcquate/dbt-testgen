@@ -49,7 +49,7 @@ jobs:
         
       - name: Generate DBT docs
         # Copies to root /docs folder
-        run: ./generate_docs.sh
+        run: bash generate_docs.sh
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
