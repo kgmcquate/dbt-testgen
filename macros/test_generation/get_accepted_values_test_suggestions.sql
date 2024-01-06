@@ -14,6 +14,10 @@
     {{ return("array_agg(CAST(" ~ adapter.quote(colname) ~ " AS STRING))") }}
 {% endmacro %}
 
+{% macro databricks__sql_agg_array(colname) %}
+    {{ return("to_json(array_agg(CAST(" ~ adapter.quote(colname) ~ " AS STRING)))") }}
+{% endmacro %}
+
 
 {% macro get_accepted_values_test_suggestions(
         table_relation,
@@ -62,9 +66,12 @@
     {% set columns = testgen.exclude_column_types(columns, exclude_types) %}
     {% set columns = testgen.exclude_column_names(columns, exclude_cols) %}
 
+    {# {{ print(columns) }} #}
     {% if columns|length == 0 %}
         {{ return(dbt_config) }}
     {% endif %}
+
+    {# {{ print(columns) }} #}
 
     {% set count_distinct_exprs = [] %}
     {% for column in columns %}
@@ -124,6 +131,7 @@
                 ]
             }
         %}
+
         {% for k,v in column_config.items() %}
             {% do col_config.update({k: v}) %}
         {% endfor %}

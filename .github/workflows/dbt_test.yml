@@ -191,4 +191,39 @@ jobs:
 
     - name: dbt test seeds
       run: dbt test --target ${DBT_TARGET} --select config.materialized:seed --exclude "dbt_utils_recency*" --exclude tag:dataset-colnames_with_spaces
+
+  test-databricks:
+    name: Test on Databricks
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.11
+
+    env:
+      DBT_TARGET: databricks
+      DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+      DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: pip install
+      run: pip install dbt-core dbt-${DBT_TARGET}
+
+    - name: Install DBT deps
+      run: dbt deps --target ${DBT_TARGET}
+      
+    - name: load test data
+      run: dbt seed --target ${DBT_TARGET} --exclude colnames_with_spaces
+
+    - name: dbt test macros
+      run: dbt test --target ${DBT_TARGET} --exclude tag:dataset-colnames_with_spaces
+      
+    - name: Create seed tests
+      run: |
+        dbt compile --target ${DBT_TARGET} -q \
+        --inline "{{ testgen.get_test_suggestions(ref('users'), resource_type='seeds', column_config={'quote': true, 'tags': ['dataset-users']} ) }}" \
+        > seeds/users_test_suggestions.yml
+
+    - name: dbt test seeds
+      run: dbt test --target ${DBT_TARGET} --select config.materialized:seed --exclude "dbt_utils_recency*" --exclude tag:dataset-colnames_with_spaces
       

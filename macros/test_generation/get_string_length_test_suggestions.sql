@@ -33,12 +33,17 @@
     {% set columns = testgen.exclude_column_types(columns, exclude_types) %}
     {% set columns = testgen.exclude_column_names(columns, exclude_cols) %}
 
+    {# {{ print(columns) }} #}
+
     {% set string_cols = [] %}
     {% for column in columns %}
-        {% if column.is_string() %}
+        {# {{ print(column.data_type) }} #}
+        {% if column.is_string() or column.data_type|lower in ["string"] %}
             {% do string_cols.append(column) %}
         {% endif %}
     {% endfor %}
+
+    {# {{ print(string_cols) }} #}
 
     {% if string_cols|length == 0 %}
         {{ return(dbt_config) }}
@@ -81,8 +86,13 @@
 
     {% set results = testgen.query_as_list(min_max_sql) %}
 
+    {# {{ print(results) }} #}
+
     {% set column_tests = [] %}
     {% for result in results %}
+
+        {# {{ print(result) }} #}
+
         {% set min_val = testgen.cast_number(result[1]) %}
         {% set max_val = testgen.cast_number(result[2]) %}
         {% set stddev = testgen.cast_number(result[3]) %}
