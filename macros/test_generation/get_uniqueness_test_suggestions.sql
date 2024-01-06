@@ -151,14 +151,16 @@
     {% set table_tests = [] %}  
     {% for unique_key in deduped_unique_keys %}
         {% if unique_key|length == 1 %}
-            {% set tests = [
-                    {"unique": column_config},
-                    {"not_null": column_config}
+            {# {% set tests = [
+                    {"unique": test_config},
+                    {"not_null": test_config}
             ] %}
 
-            {% if column_config == {} %}
-                {% set tests = ["unique", "not_null"] %}
-            {% endif %}
+            {% if test_config == {} %}
+                
+            {% endif %} #}
+
+            {% set tests = ["unique", "not_null"] %}
 
             {% set col_config = {
                     "name": unique_key[0],
