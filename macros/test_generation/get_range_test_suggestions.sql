@@ -7,12 +7,12 @@
         column_config = {},
         exclude_types = [],
         exclude_cols = [],
-        tags = ["range"],
+        stddevs = 0,
         dbt_config = None
     ) %}
     {# Run macro for the specific target DB #}
     {% if execute %}
-        {{ return(adapter.dispatch('get_range_test_suggestions', 'testgen')(table_relation, sample, limit, resource_type, column_config, exclude_types, exclude_cols, tags, dbt_config, **kwargs)) }}
+        {{ return(adapter.dispatch('get_range_test_suggestions', 'testgen')(table_relation, sample, limit, resource_type, column_config, exclude_types, exclude_cols, stddevs, dbt_config, **kwargs)) }}
     {% endif%}
 {%- endmacro %}
 
@@ -25,15 +25,10 @@
         column_config = {},
         exclude_types = [],
         exclude_cols = [],
-        tags = ["range"],
+        stddevs = 0,
         dbt_config = None
     ) 
 %}
-    {# kwargs is used for test configurations #}
-    {# {% if tags != None %}
-        {% do test_config.update({"tags": tags}) %}
-    {% endif %} #}
-
     {% set columns = adapter.get_columns_in_relation(table_relation) %}
     {% set columns = testgen.exclude_column_types(columns, exclude_types) %}
     {% set columns = testgen.exclude_column_names(columns, exclude_cols) %}
@@ -65,6 +60,7 @@
             "SELECT '" ~ column.column ~ "' AS COLNAME, " ~ 
                 "MIN(" ~ adapter.quote(column.column) ~ ") as COL_MIN, " ~ 
                 "MAX(" ~ adapter.quote(column.column) ~ ") as COL_MAX, " ~ 
+                "STDDEV(" ~ adapter.quote(column.column) ~ ") as COL_STDDEV, " ~ 
                 loop.index ~ " AS ORDERING " ~ 
             "FROM base"
         ) %}
@@ -86,13 +82,16 @@
 
     {% set column_tests = [] %}
     {% for result in results %}
+        {% set min_val = testgen.cast_number(result[1]) %}
+        {% set max_val = testgen.cast_number(result[2]) %}
+        {% set stddev = testgen.cast_number(result[3]) %}
         {% set col_config = {
                 "name": result[0],
                 "tests": [
                     {
                         "dbt_utils.accepted_range": {
-                            "min_value": testgen.cast_number(result[1]),
-                            "max_value": testgen.cast_number(result[2])
+                            "min_value": testgen.cast_number(min_val - (stddevs*stddev / 2)),
+                            "max_value": testgen.cast_number(max_val + (stddevs*stddev / 2) )
                         }
                     }
                 ]

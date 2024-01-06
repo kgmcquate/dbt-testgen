@@ -7,12 +7,12 @@
         column_config = {},
         exclude_types = [],
         exclude_cols = [],
-        tags = ["string_length"],
+        stddevs = 0,
         dbt_config = None
     ) %}
     {# Run macro for the specific target DB #}
     {% if execute %}
-        {{ return(adapter.dispatch('get_string_length_test_suggestions', 'testgen')(table_relation, sample, limit, resource_type, column_config, exclude_types, exclude_cols, tags, dbt_config, **kwargs)) }}
+        {{ return(adapter.dispatch('get_string_length_test_suggestions', 'testgen')(table_relation, sample, limit, resource_type, column_config, exclude_types, exclude_cols, stddevs, dbt_config, **kwargs)) }}
     {% endif%}
 {%- endmacro %}
 
@@ -25,15 +25,10 @@
         column_config = {},
         exclude_types = [],
         exclude_cols = [],
-        tags = ["string_length"],
+        stddevs = 0,
         dbt_config = None
     ) 
 %}
-    {# kwargs is used for test configurations #}
-    {# {% if tags != None %}
-        {% do test_config.update({"tags": tags}) %}
-    {% endif %} #}
-
     {% set columns = adapter.get_columns_in_relation(table_relation) %}
     {% set columns = testgen.exclude_column_types(columns, exclude_types) %}
     {% set columns = testgen.exclude_column_names(columns, exclude_cols) %}
@@ -65,6 +60,7 @@
             "SELECT '" ~ column.column ~ "' AS COLNAME, " ~ 
                 "MIN(LENGTH(" ~ adapter.quote(column.column) ~ ")) as COL_MIN, " ~ 
                 "MAX(LENGTH(" ~ adapter.quote(column.column) ~ ")) as COL_MAX, " ~ 
+                "STDDEV(LENGTH(" ~ adapter.quote(column.column) ~ ")) as COL_STDDEV, " ~ 
                 loop.index ~ " AS ORDERING " ~ 
             "FROM base 
             WHERE " ~ adapter.quote(column.column) ~ " IS NOT NULL"
@@ -87,20 +83,28 @@
 
     {% set column_tests = [] %}
     {% for result in results %}
+        {% set min_val = testgen.cast_number(result[1]) %}
+        {% set max_val = testgen.cast_number(result[2]) %}
+        {% set stddev = testgen.cast_number(result[3]) %}
 
-        {% if result[1] == result[2] %}
+        {% if min_val == max_val %}
             {% set test = {
                     "dbt_expectations.expect_column_value_lengths_to_equal": {
-                        "value": result[1],
+                        "value": min_val,
                         "row_condition": adapter.quote(result[0]) ~ " is not null"
                     }
                 }
             %}
         {% else %}
+            {% set min_val = min_val - stddevs*stddev %}
+            {% set max_val = max_val + stddevs*stddev %}
+            {% if min_val < 0 %}
+                {% set min_val = 0 %}
+            {% endif %}
             {% set test = {
                     "dbt_expectations.expect_column_value_lengths_to_be_between": {
-                        "min_value": result[1],
-                        "max_value": result[2],
+                        "min_value": testgen.cast_number(min_val),
+                        "max_value": testgen.cast_number(max_val),
                         "row_condition": adapter.quote(result[0]) ~ " is not null"
                     }
                 }
