@@ -1,0 +1,55 @@
+
+:root {
+    --main-bg-color: rgb(85, 85, 85);
+    --secondary-bg-color: rgb(209, 209, 209);
+    --main-color: rgb(85, 85, 85);
+  }
+
+search {
+    background-color: var(--secondary-bg-color) !important ;
+    color: var(--main-color) !important;
+}
+
+.panel-body {
+    background-color: var(--secondary-bg-color) !important ;
+    color: var(--main-color) !important;
+}
+
+
+.app-content {
+    background-color: var(--main-bg-color) !important ;
+    color: var(--main-color) !important;
+}
+
+.app-pad {
+    background-color: var(--main-bg-color) !important ;
+    color: var(--main-color) !important;
+}
+
+.app-pad-h {
+    background-color: var(--main-bg-color) !important ;
+    color: var(--main-color) !important;
+}
+
+.app-links {
+    background-color: var(--secondary-bg-color) !important ;
+    color: var(--main-color) !important;
+}
+
+.app-header {
+    background-color: var(--main-bg-color) !important ;
+    color: var(--main-color) !important;
+}
+
+.switch-label {
+    background-color: var(--secondary-bg-color) !important ;
+    color: var(--main-color) !important;
+}
+
+.filename {
+    background-color: var(--secondary-bg-color) !important ;
+}
+
+.app-scroll {
+    background-color: var(--secondary-bg-color) !important ;
+}

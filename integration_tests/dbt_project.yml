@@ -17,3 +17,7 @@ seeds:
   +schema: integration_test_data
   +quote_columns: true
 
+models:
+  dbt_utils: # Hide "dbt_utils" package
+    +docs:
+      show: false

@@ -1,16 +1,16 @@
-{% macro array_agg(colname) %}
-     {{ return(adapter.dispatch('array_agg', 'testgen')(colname)) }}
+{% macro sql_agg_array(colname) %}
+     {{ return(adapter.dispatch('sql_agg_array', 'testgen')(colname)) }}
 {% endmacro %}
 
-{% macro default__array_agg(colname) %}
+{% macro default__sql_agg_array(colname) %}
     {{ return("array_agg(" ~ adapter.quote(colname) ~ "::VARCHAR)") }}
 {% endmacro %}
 
-{% macro redshift__array_agg(colname) %}
+{% macro redshift__sql_agg_array(colname) %}
     {{ return("split_to_array(listagg(" ~ adapter.quote(colname) ~ "::VARCHAR, '|'), '|') ") }}
 {% endmacro %}
 
-{% macro bigquery__array_agg(colname) %}
+{% macro bigquery__sql_agg_array(colname) %}
     {{ return("array_agg(CAST(" ~ adapter.quote(colname) ~ " AS STRING))") }}
 {% endmacro %}
 
@@ -23,7 +23,6 @@
         column_config = {},
         exclude_types = ["float"],
         exclude_cols = [],
-        tags = ["accepted_values"],
         max_cardinality = 5,
         dbt_config = None
     ) %}
@@ -38,7 +37,6 @@
                 column_config,
                 exclude_types, 
                 exclude_cols, 
-                tags, 
                 max_cardinality, 
                 dbt_config,
                 **kwargs)
@@ -56,20 +54,17 @@
         column_config = {},
         exclude_types = ["float"],
         exclude_cols = [],
-        tags = ["accepted_values"],
         max_cardinality = 5,
         dbt_config = None
     ) 
 %}
-    {# kwargs is used for test configurations #}
-    {# {% set test_config = kwargs %} #}
-    {# {% if tags != None %}
-        {% do test_config.update({"tags": tags}) %}
-    {% endif %} #}
-
     {% set columns = adapter.get_columns_in_relation(table_relation) %}
     {% set columns = testgen.exclude_column_types(columns, exclude_types) %}
     {% set columns = testgen.exclude_column_names(columns, exclude_cols) %}
+
+    {% if columns|length == 0 %}
+        {{ return(dbt_config) }}
+    {% endif %}
 
     {% set count_distinct_exprs = [] %}
     {% for column in columns %}
@@ -79,7 +74,7 @@
             select " ~ loop.index ~ " AS ORDERING, 
                 '" ~ column.column ~ "' AS COLNAME, 
                 count(1) as CARDINALITY, " ~ 
-                testgen.array_agg(column.column) ~ " AS UNIQUE_VALUES
+                testgen.sql_agg_array(column.column) ~ " AS UNIQUE_VALUES
             from (
                 select " ~ adapter.quote(column.column) ~ "
                 from base

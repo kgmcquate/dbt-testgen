@@ -11,7 +11,7 @@
             {% do filtered_columns.append(col) %}
         {% elif col.is_float() and "float" not in exclude_types %}
             {% do filtered_columns.append(col) %}
-        {% elif col.column not in exclude_cols %}
+        {% elif col.data_type not in exclude_types %}
             {% do filtered_columns.append(col) %}
         {% endif %}
     {% endfor %}
@@ -26,4 +26,14 @@
         {% endif %}
     {% endfor %}
     {{ return(filtered_columns) }}
+{% endmacro %}
+
+{% macro cast_number(number) %}
+    {% set number = number|string|float|string %}
+    {% if number[-2:] == '.0' %}
+        {% set number = number|int %}
+    {% else %}
+        {% set number = number|float %}
+    {% endif %}
+    {{ return(number) }}
 {% endmacro %}
