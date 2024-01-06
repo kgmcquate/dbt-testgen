@@ -3,6 +3,10 @@ name: Test DBT package
 on:
   push:
     branches: [ "main", "develop" ]
+    paths:
+      - macros/
+      - dbt_project.yml
+      - .github/workflows/dbt_test.yml
 
 permissions:
   contents: read
