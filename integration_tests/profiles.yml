@@ -66,6 +66,7 @@ integration_tests:
       type: databricks
       #catalog: [optional catalog name if you are using Unity Catalog]
       schema: hive_metastore # Required
+      database: dbt_testgen
       host: dbc-ce3894e5-7741.cloud.databricks.com # Required
       http_path: /sql/1.0/warehouses/f16c9d04325bef22 # Required
       auth_type: oauth
