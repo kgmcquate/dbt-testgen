@@ -102,6 +102,8 @@ models:
         max_value: 35
 ```
 
+Note: In dbt Cloud, the YAML will be logged in `System Logs`.
+
 <hr>
 <br>
 
