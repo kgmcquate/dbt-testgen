@@ -1,10 +1,11 @@
 name: Test DBT package
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "main", "develop" ]
     paths:
-      - macros/
+      - macros/**
       - dbt_project.yml
       - .github/workflows/dbt_test.yml
 

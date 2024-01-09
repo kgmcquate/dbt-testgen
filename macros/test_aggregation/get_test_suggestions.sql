@@ -91,7 +91,9 @@
         {% if return_object %}
             {{ return(dbt_config) }}
         {% else %}
-            {{ print(testgen.to_yaml(dbt_config)) }}
+            {% set the_yaml = testgen.to_yaml(dbt_config) %}
+            {{ print(the_yaml) }}
+            {{ return(the_yaml) }}
         {% endif %}
     {% endif %}
 {%- endmacro %}
