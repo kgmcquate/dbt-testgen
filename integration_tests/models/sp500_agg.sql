@@ -11,7 +11,7 @@ formatted as (
 )
 SELECT
     adapter.quote("month"),
-    MAX(high) as adapter.quote("high"),
-    MIN(low) as adapter.quote("low")
+    MAX(high) as {{ adapter.quote("high") }},
+    MIN(low) as {{ adapter.quote("low") }}
 FROM formatted
 GROUP BY month
