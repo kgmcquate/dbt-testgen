@@ -117,7 +117,7 @@
         ORDER BY ORDERING ASC
     {% endset %}
 
-    {# {{ print(count_distinct_sql) }} #}
+    {{ print(count_distinct_sql) }}
 
     {% set cardinality_results = testgen.query_as_list(count_distinct_sql) %}
 
