@@ -1,6 +1,6 @@
 
 {% macro get_test_suggestions(
-        table_relation,
+        relation_name,
         sample = false,
         limit = 10000,
         resource_type = "models",
@@ -20,7 +20,7 @@
     {% if execute %}
         {% if "uniqueness" in tests %}
             {% set dbt_config = testgen.get_uniqueness_test_suggestions(
-                table_relation=table_relation,
+                relation_name=relation_name,
                 sample=sample,
                 limit=limit,
                 resource_type=resource_type,
@@ -34,7 +34,7 @@
 
         {% if "accepted_values" in tests %}
             {% set dbt_config = testgen.get_accepted_values_test_suggestions(
-                table_relation=table_relation,
+                relation_name=relation_name,
                 sample=sample,
                 limit=limit,
                 resource_type=resource_type,
@@ -48,7 +48,7 @@
 
         {% if "range" in tests %}
             {% set dbt_config = testgen.get_range_test_suggestions(
-                table_relation=table_relation,
+                relation_name=relation_name,
                 sample=sample,
                 limit=limit,
                 resource_type=resource_type,
@@ -62,7 +62,7 @@
 
         {% if "string_length" in tests %}
             {% set dbt_config = testgen.get_string_length_test_suggestions(
-                table_relation=table_relation,
+                relation_name=relation_name,
                 sample=sample,
                 limit=limit,
                 resource_type=resource_type,
@@ -76,7 +76,7 @@
 
         {% if "recency" in tests %}
             {% set dbt_config = testgen.get_recency_test_suggestions(
-                table_relation=table_relation,
+                relation_name=relation_name,
                 sample=sample,
                 limit=limit,
                 resource_type=resource_type,

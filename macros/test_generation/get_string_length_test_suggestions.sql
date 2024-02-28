@@ -1,6 +1,6 @@
 
 {% macro get_string_length_test_suggestions(
-        table_relation,
+        relation_name,
         sample = false,
         limit = None,
         resource_type = "models",
@@ -12,13 +12,13 @@
     ) %}
     {# Run macro for the specific target DB #}
     {% if execute %}
-        {{ return(adapter.dispatch('get_string_length_test_suggestions', 'testgen')(table_relation, sample, limit, resource_type, column_config, exclude_types, exclude_cols, stddevs, dbt_config, **kwargs)) }}
+        {{ return(adapter.dispatch('get_string_length_test_suggestions', 'testgen')(relation_name, sample, limit, resource_type, column_config, exclude_types, exclude_cols, stddevs, dbt_config, **kwargs)) }}
     {% endif%}
 {%- endmacro %}
 
 
 {% macro default__get_string_length_test_suggestions(
-        table_relation,
+        relation_name,
         sample = false,
         limit = None,
         resource_type = "models",
@@ -29,7 +29,9 @@
         dbt_config = None
     ) 
 %}
-    {% set columns = adapter.get_columns_in_relation(table_relation) %}
+    {% set relation_name = testgen.get_relation_name(relation_name) %}
+    {% set relation = testgen.get_relation(relation_name) %}
+    {% set columns = adapter.get_columns_in_relation(relation) %}
     {% set columns = testgen.exclude_column_types(columns, exclude_types) %}
     {% set columns = testgen.exclude_column_names(columns, exclude_cols) %}
 
@@ -75,7 +77,7 @@
 
     {% set min_max_sql %}
         WITH base AS (
-            SELECT * FROM {{ table_relation }}
+            SELECT * FROM {{ relation }}
             {{ limit_stmt }}
         )
         SELECT * FROM (
@@ -134,7 +136,7 @@
         {% do column_tests.append(col_config) %}
     {% endfor %}
 
-    {% set model = {"name": table_relation.identifier,  "columns": column_tests} %}
+    {% set model = {"name": testgen.get_relation_name(relation_name),  "columns": column_tests} %}
 
     {% set new_dbt_config = {resource_type: [model]} %}
 

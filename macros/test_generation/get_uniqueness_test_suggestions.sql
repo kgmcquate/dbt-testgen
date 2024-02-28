@@ -2,7 +2,7 @@
 
 
 {% macro get_uniqueness_test_suggestions(
-        table_relation,
+        relation_name,
         sample = false,
         limit = None,
         resource_type = "models",
@@ -15,14 +15,14 @@
     {# Run macro for the specific target DB #}
     {% if execute %}
         {{ return(
-            adapter.dispatch('get_uniqueness_test_suggestions', 'testgen')(table_relation, sample, limit, resource_type, column_config, exclude_types, exclude_cols, composite_key_length, dbt_config, **kwargs)
+            adapter.dispatch('get_uniqueness_test_suggestions', 'testgen')(relation_name, sample, limit, resource_type, column_config, exclude_types, exclude_cols, composite_key_length, dbt_config, **kwargs)
         ) }}
     {% endif %}
 {% endmacro %}
 
 
 {% macro default__get_uniqueness_test_suggestions(
-        table_relation,
+        relation_name,
         sample = false,
         limit = None,
         resource_type = "models",
@@ -33,7 +33,9 @@
         dbt_config = None
     ) 
 %}
-    {% set columns = adapter.get_columns_in_relation(table_relation) %}
+    {% set relation_name = testgen.get_relation_name(relation_name) %}
+    {% set relation = testgen.get_relation(relation_name) %}
+    {% set columns = adapter.get_columns_in_relation(relation) %}
     {% set columns = testgen.exclude_column_types(columns, exclude_types) %}
     {% set columns = testgen.exclude_column_names(columns, exclude_cols) %}
 
@@ -88,16 +90,18 @@
 
     {% set count_distinct_sql %}
     WITH base AS (
-            SELECT * FROM {{ table_relation }}
+            SELECT * FROM {{ relation }}
             {{ limit_stmt }}
         )
     {{ count_distinct_exprs | join("\nUNION ALL\n") }}
     ORDER BY ordering ASC
     {% endset %}
 
+    {# {{ print(count_distinct_sql) }} #}
+
     {% set count_sql %}
         WITH base AS (
-            SELECT * FROM {{ table_relation }}
+            SELECT * FROM {{ relation }}
             {{ limit_stmt }}
         )
         SELECT count(1) AS TABLE_COUNT FROM base
@@ -183,7 +187,7 @@
         {% endif %}
     {% endfor %}
 
-    {% set model = {"name": table_relation.identifier,  "columns": column_tests} %}
+    {% set model = {"name": relation_name, "columns": column_tests} %}
     {% if table_tests != [] %}
         {% do model.update({"tests": table_tests}) %} 
     {% endif %}

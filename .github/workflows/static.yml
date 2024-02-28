@@ -49,13 +49,13 @@ jobs:
         
       - name: Generate DBT docs
         # Copies to root /docs folder
-        run: bash generate_docs.sh
+        run: bash docs/generate_docs.sh
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
-          path: '../docs/'
+          path: integration_tests/static/
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

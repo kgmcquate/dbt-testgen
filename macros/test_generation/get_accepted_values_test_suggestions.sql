@@ -20,7 +20,7 @@
 
 
 {% macro get_accepted_values_test_suggestions(
-        table_relation,
+        relation_name,
         sample = false,
         limit = None,
         resource_type = "models",
@@ -34,7 +34,7 @@
     {% if execute %}
         {{ return(
             adapter.dispatch('get_accepted_values_test_suggestions', 'testgen')(
-                table_relation, 
+                relation_name, 
                 sample, 
                 limit, 
                 resource_type,
@@ -51,7 +51,7 @@
 
 
 {% macro default__get_accepted_values_test_suggestions(
-        table_relation,
+        relation_name,
         sample = false,
         limit = None,
         resource_type = "models",
@@ -62,7 +62,9 @@
         dbt_config = None
     ) 
 %}
-    {% set columns = adapter.get_columns_in_relation(table_relation) %}
+    {% set relation_name = testgen.get_relation_name(relation_name) %}
+    {% set relation = testgen.get_relation(relation_name) %}
+    {% set columns = adapter.get_columns_in_relation(relation) %}
     {% set columns = testgen.exclude_column_types(columns, exclude_types) %}
     {% set columns = testgen.exclude_column_names(columns, exclude_cols) %}
 
@@ -103,7 +105,7 @@
 
     {% set count_distinct_sql %}
         WITH base AS (
-            SELECT * FROM {{ table_relation }}
+            SELECT * FROM {{ relation }}
             {{ limit_stmt }}
         )
         SELECT * FROM (
@@ -139,7 +141,7 @@
         {% do column_tests.append(col_config) %}
     {% endfor %}
 
-    {% set new_dbt_config = {resource_type: [{"name": table_relation.identifier, "columns": column_tests}]} %}
+    {% set new_dbt_config = {resource_type: [{"name": testgen.get_relation_name(relation_name), "columns": column_tests}]} %}
 
     {# {{ print(new_dbt_config) }} #}
 
