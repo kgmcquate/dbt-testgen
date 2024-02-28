@@ -63,7 +63,9 @@
     ) 
 %}
     {% set relation_name = testgen.get_relation_name(relation_name) %}
+    {{ print(relation_name) }}
     {% set relation = testgen.get_relation(relation_name) %}
+    {{ print(relation) }}
     {% set columns = adapter.get_columns_in_relation(relation) %}
     {% set columns = testgen.exclude_column_types(columns, exclude_types) %}
     {% set columns = testgen.exclude_column_names(columns, exclude_cols) %}
@@ -73,7 +75,7 @@
         {{ return(dbt_config) }}
     {% endif %}
 
-    {# {{ print(columns) }} #}
+    {{ print(columns) }} 
 
     {% set count_distinct_exprs = [] %}
     {% for column in columns %}
