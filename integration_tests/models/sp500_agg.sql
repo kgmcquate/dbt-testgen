@@ -4,7 +4,7 @@
 WITH
 formatted as (
     SELECT
-        {{ dbt_date.date_part("month", adapter.quote("day")) }} as month,
+        {{ dbt_date.date_part("month", adapter.quote("day")) }} as {{ adapter.quote("month") }},
         {{ adapter.quote("high") }} as high,
         {{ adapter.quote("low") }} as low
     FROM {{ ref('sp500_daily') }}
