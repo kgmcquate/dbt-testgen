@@ -4,7 +4,7 @@
 WITH
 formatted as (
     SELECT
-        date_part('dayofweek', day) as day_of_week,
+        {{ dbt_date.date_part("dayofweek", "day") }} as day_of_week,
         high,
         low
     FROM {{ ref('sp500_daily') }}

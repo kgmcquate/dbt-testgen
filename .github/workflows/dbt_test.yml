@@ -115,6 +115,9 @@ jobs:
 
     - name: load test data
       run: dbt seed --target ${DBT_TARGET}
+    
+    - name: run models
+      run: dbt run --target ${DBT_TARGET}
 
     - name: dbt test macros
       run: dbt test --target ${DBT_TARGET}
@@ -146,6 +149,9 @@ jobs:
 
     - name: load test data
       run: dbt seed --target ${DBT_TARGET}
+
+    - name: run models
+      run: dbt run --target ${DBT_TARGET}
 
     - name: dbt test macros
       run: dbt test --target ${DBT_TARGET}
@@ -186,6 +192,9 @@ jobs:
       
     - name: load test data
       run: dbt seed --target ${DBT_TARGET} --exclude colnames_with_spaces
+    
+    - name: run models
+      run: dbt run --target ${DBT_TARGET}
 
     - name: dbt test macros
       run: dbt test --target ${DBT_TARGET} --exclude tag:dataset-colnames_with_spaces
@@ -221,6 +230,9 @@ jobs:
       
     - name: load test data
       run: dbt seed --target ${DBT_TARGET} --exclude colnames_with_spaces
+
+    - name: run models
+      run: dbt run --target ${DBT_TARGET}
 
     - name: dbt test macros
       run: dbt test --target ${DBT_TARGET} --exclude tag:dataset-colnames_with_spaces
