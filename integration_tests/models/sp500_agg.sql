@@ -4,14 +4,14 @@
 WITH
 formatted as (
     SELECT
-        {{ dbt_date.date_part("dayofweek", "day") }} as day_of_week,
+        {{ dbt_date.date_part("month", adapter.quote("day")) }} as month,
         high,
         low
     FROM {{ ref('sp500_daily') }}
 )
 SELECT
-    day_of_week,
+    month,
     MAX(high) as high,
     MIN(low) as low
 FROM formatted
-GROUP BY day_of_week
+GROUP BY month

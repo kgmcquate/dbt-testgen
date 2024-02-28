@@ -16,33 +16,27 @@
 models:
 - name: sp500_agg
   columns:
-  - name: day_of_week
+  - name: month
     tests:
     - unique
     - not_null
     - accepted_values:
         values:
         - '1'
-        - '2'
-        - '3'
-        - '4'
-        - '5'
+        - '12'
     - dbt_utils.accepted_range:
         min_value: 1
-        max_value: 5
+        max_value: 12
   - name: high
     tests:
     - unique
     - not_null
     - accepted_values:
         values:
-        - '4749.52'
-        - '4784.72'
-        - '4785.39'
-        - '4788.43'
+        - '4754.33'
         - '4793.3'
     - dbt_utils.accepted_range:
-        min_value: 4749.52
+        min_value: 4754.33
         max_value: 4793.3
   - name: low
     tests:
@@ -51,13 +45,10 @@ models:
     - accepted_values:
         values:
         - '4546.5'
-        - '4546.72'
-        - '4551.68'
-        - '4565.22'
-        - '4574.06'
+        - '4722.67'
     - dbt_utils.accepted_range:
         min_value: 4546.5
-        max_value: 4574.06
+        max_value: 4722.67
 {% endset %}
 
 {{ assert_equal (actual_yaml | trim, expected_yaml | trim) }}
