@@ -10,8 +10,8 @@ formatted as (
     FROM {{ ref('sp500_daily') }}
 )
 SELECT
-    month,
-    MAX(high) as high,
-    MIN(low) as low
+    adapter.quote("month"),
+    MAX(high) as adapter.quote("high"),
+    MIN(low) as adapter.quote("low")
 FROM formatted
 GROUP BY month
